@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Felton Remembers 2026 Parade Lineup</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --blue:#2563eb; --blue-light:#dbeafe; --red:#dc2626;
+  --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0; --gray-300:#cbd5e1;
+  --gray-400:#94a3b8; --gray-600:#475569; --gray-800:#1e293b; --white:#ffffff;
+  --shadow:0 1px 3px rgba(0,0,0,0.1); --shadow-md:0 4px 12px rgba(0,0,0,0.12);
+}
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--gray-50); color:var(--gray-800); min-height:100vh; }
+
+/* ── HEADER ── */
+header { background:var(--blue); color:white; padding:10px 16px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; position:sticky; top:0; z-index:100; box-shadow:var(--shadow-md); }
+header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
+.hbtns { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.sync-status { font-size:0.72rem; opacity:0.85; white-space:nowrap; }
+.lock-status { font-size:0.72rem; white-space:nowrap; color:#fde68a; }
+
+/* ── BUTTONS ── */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:8px 14px; border-radius:8px; border:none; cursor:pointer; font-size:0.875rem; font-weight:600; min-height:44px; transition:opacity 0.15s,transform 0.1s; white-space:nowrap; }
+.btn:active { transform:scale(0.97); }
+.btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+.btn-primary { background:var(--blue); color:white; }
+.btn-secondary { background:var(--white); color:var(--blue); border:2px solid var(--blue); }
+.btn-ghost { background:rgba(255,255,255,0.18); color:white; }
+.btn-ghost:hover { background:rgba(255,255,255,0.28); }
+.btn-sm { padding:6px 10px; font-size:0.8rem; min-height:36px; }
+.btn-icon { padding:0; width:40px; height:40px; border-radius:8px; background:var(--gray-100); color:var(--gray-800); border:1px solid var(--gray-200); font-size:1rem; min-height:40px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+.btn-icon:hover:not(:disabled) { background:var(--gray-200); }
+.btn-icon:disabled { opacity:0.3; cursor:not-allowed; }
+
+/* ── VIEWS ── */
+.container { max-width:820px; margin:0 auto; padding:16px; }
+
+/* ── SEARCH ROW ── */
+.search-row { display:flex; gap:8px; margin-bottom:14px; align-items:center; }
+.search-input { flex:1; padding:10px 14px; border:2px solid var(--gray-200); border-radius:8px; font-size:1rem; background:white; min-height:44px; }
+.search-input:focus { outline:none; border-color:var(--blue); }
+
+/* ── FLOAT LIST ── */
+.float-list { display:flex; flex-direction:column; gap:8px; }
+.float-card { background:white; border:2px solid var(--gray-200); border-radius:12px; padding:10px 12px; display:flex; align-items:center; gap:8px; }
+.float-card.has-safety { border-left:4px solid var(--red); }
+.float-card.dragging { opacity:0.35; }
+.float-card.drag-over { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-light); }
+.drag-handle { cursor:grab; color:var(--gray-400); font-size:1.3rem; flex-shrink:0; padding:4px 2px; user-select:none; }
+.drag-handle:active { cursor:grabbing; }
+
+/* ── POSITION BADGE ── */
+.pos-badge { background:var(--blue); color:white; font-weight:800; font-size:0.95rem; border-radius:8px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pos-badge.pos-editable { cursor:pointer; }
+.pos-badge.pos-editable:hover { background:#1d4ed8; }
+.pos-input { width:40px; height:36px; text-align:center; font-size:0.95rem; font-weight:800; border:2px solid var(--blue); border-radius:8px; background:var(--blue-light); color:var(--blue); flex-shrink:0; padding:0; }
+.pos-input:focus { outline:none; }
+.pos-input::-webkit-outer-spin-button,.pos-input::-webkit-inner-spin-button { -webkit-appearance:none; }
+.pos-input[type=number] { -moz-appearance:textfield; }
+
+/* ── EMOJI CELL ── */
+.emoji-cell { display:flex; flex-direction:column; align-items:center; flex-shrink:0; width:52px; }
+.emoji-btn { font-size:1.9rem; line-height:1; background:none; border:2px solid transparent; border-radius:8px; cursor:default; padding:2px; width:46px; height:46px; display:flex; align-items:center; justify-content:center; transition:border-color 0.12s,background 0.12s; }
+.emoji-btn.editable { cursor:pointer; }
+.emoji-btn.editable:hover { border-color:var(--blue); background:var(--blue-light); }
+.ename { font-size:0.62rem; color:var(--gray-600); font-weight:700; text-transform:uppercase; letter-spacing:0.04em; text-align:center; margin-top:2px; }
+
+/* ── FLOAT INFO ── */
+.float-info { flex:1; min-width:0; }
+.float-name { font-weight:700; font-size:0.98rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.float-notes { font-size:0.83rem; color:var(--gray-600); margin-top:3px; display:flex; align-items:flex-start; gap:4px; }
+.float-notes.safety { color:var(--red); font-weight:600; }
+.float-actions { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+.arrow-col { display:flex; flex-direction:column; gap:2px; }
+
+/* ── EDIT / ADD FORMS ── */
+.edit-form { background:var(--gray-50); border:2px solid var(--blue); border-radius:10px; padding:10px; margin-top:8px; }
+.add-form { background:white; border:2px solid var(--blue); border-radius:12px; padding:16px; margin-top:14px; }
+.add-form-title { font-size:1rem; font-weight:700; color:var(--blue); margin-bottom:12px; }
+.form-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+.form-input { flex:1; min-width:130px; padding:9px 12px; border:2px solid var(--gray-200); border-radius:8px; font-size:0.92rem; min-height:44px; }
+.form-input:focus { outline:none; border-color:var(--blue); }
+.form-btns { display:flex; gap:8px; }
+.emoji-preview-btn { font-size:1.9rem; width:52px; height:52px; display:flex; align-items:center; justify-content:center; border:2px solid var(--blue); border-radius:8px; cursor:pointer; background:var(--blue-light); flex-shrink:0; }
+
+/* ── EMOJI PICKER ── */
+.emoji-picker { background:white; border:2px solid var(--blue); border-radius:12px; padding:10px; margin-top:8px; box-shadow:var(--shadow-md); }
+.emoji-picker-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(42px,1fr)); gap:3px; }
+.emoji-option { font-size:1.55rem; width:42px; height:42px; display:flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer; border:2px solid transparent; background:none; padding:0; transition:background 0.1s,border-color 0.1s; }
+.emoji-option:hover:not(.used):not(.selected) { background:var(--blue-light); border-color:var(--blue); }
+.emoji-option.selected { background:var(--blue); border-color:var(--blue); }
+.emoji-option.used { opacity:0.22; cursor:not-allowed; }
+
+/* ── MODALS ── */
+.modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:200; padding:16px; }
+.modal { background:white; border-radius:16px; padding:24px; width:100%; max-width:440px; box-shadow:var(--shadow-md); max-height:calc(100vh - 32px); overflow-y:auto; }
+.modal h2 { font-size:1.1rem; margin-bottom:14px; }
+.modal-input { width:100%; padding:10px 14px; border:2px solid var(--gray-200); border-radius:8px; font-size:0.95rem; margin-bottom:10px; min-height:44px; }
+.modal-input:focus { outline:none; border-color:var(--blue); }
+.modal-error { color:var(--red); font-size:0.875rem; margin-bottom:10px; display:none; }
+.modal-btns { display:flex; gap:8px; }
+
+/* ── SYNC SETUP MODAL ── */
+.setup-modal { max-width:560px; padding:0; display:flex; flex-direction:column; overflow:hidden; }
+.modal-header { display:flex; align-items:center; justify-content:space-between; padding:18px 24px 14px; border-bottom:1px solid var(--gray-200); flex-shrink:0; border-radius:16px 16px 0 0; }
+.modal-header h2 { font-size:1.1rem; margin:0; }
+.modal-body { padding:24px; overflow-y:auto; flex:1; }
+.modal-close { background:none; border:none; font-size:1.2rem; cursor:pointer; color:var(--gray-400); line-height:1; padding:6px 8px; border-radius:6px; transition:background 0.1s,color 0.1s; }
+.modal-close:hover { background:var(--gray-100); color:var(--gray-800); }
+.setup-step { margin-bottom:14px; }
+.setup-step p { font-size:0.9rem; color:var(--gray-600); margin-bottom:6px; line-height:1.5; }
+.setup-step strong { color:var(--gray-800); }
+.code-block { background:var(--gray-100); border:1px solid var(--gray-200); border-radius:8px; padding:10px 12px; font-family:monospace; font-size:0.78rem; white-space:pre; overflow-x:auto; position:relative; line-height:1.5; }
+.code-copy { position:absolute; top:6px; right:6px; padding:3px 8px; font-size:0.72rem; border-radius:5px; background:var(--blue); color:white; border:none; cursor:pointer; font-weight:600; }
+.url-input { width:100%; padding:9px 12px; border:2px solid var(--gray-200); border-radius:8px; font-size:0.85rem; min-height:44px; margin-top:6px; font-family:monospace; }
+.url-input:focus { outline:none; border-color:var(--blue); }
+.url-status { font-size:0.82rem; margin-top:6px; }
+.url-status.ok  { color:#16a34a; }
+.url-status.err { color:var(--red); }
+
+/* ── MISC ── */
+.empty-state { text-align:center; padding:48px 16px; color:var(--gray-400); }
+.empty-state .big { font-size:3rem; margin-bottom:12px; }
+.toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:var(--gray-800); color:white; padding:10px 22px; border-radius:100px; font-size:0.875rem; z-index:300; transition:opacity 0.3s; pointer-events:none; white-space:nowrap; }
+.toast.hidden { opacity:0; }
+
+@media (max-width:520px) {
+  header h1 { font-size:0.85rem; }
+  .float-actions { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════ -->
+<header>
+  <h1>Felton Remembers 2026 Parade Lineup</h1>
+  <div class="hbtns">
+    <span class="sync-status" id="sync-status"></span>
+    <span class="lock-status" id="lock-status" style="display:none"></span>
+    <button class="btn btn-ghost btn-sm" id="btn-sync" onclick="syncFromSheet()" style="display:none" title="Sync new registrations from spreadsheet">⟳ Sync</button>
+    <button class="btn btn-ghost btn-sm" id="btn-save" onclick="saveOrderToSheet()" style="display:none" title="Save current order to sheet">💾 Save Order</button>
+    <button class="btn btn-ghost btn-sm" id="btn-setup" onclick="openSyncModal()" style="display:none" title="Configure sheet sync">⚙️</button>
+    <button class="btn btn-ghost" id="btn-auth" onclick="toggleAuth()">🔒 Unlock</button>
+  </div>
+</header>
+
+<!-- ═══ AUTH MODAL ═══════════════════════════════════ -->
+<div class="modal-overlay" id="auth-modal" style="display:none" onclick="if(event.target===this)closeAuthModal()">
+  <div class="modal">
+    <h2>🔐 Enter Password</h2>
+    <input class="modal-input" type="text" id="user-name-input" placeholder="Your name (for edit lock)"
+           onkeydown="if(event.key==='Enter')document.getElementById('pw-input').focus()">
+    <input class="modal-input" type="password" id="pw-input" placeholder="Password"
+           onkeydown="if(event.key==='Enter')submitAuth()">
+    <div class="modal-error" id="pw-error">Incorrect password. Try again.</div>
+    <div class="modal-error" id="lock-error" style="color:var(--red)"></div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" style="flex:1" onclick="submitAuth()">Unlock</button>
+      <button class="btn btn-secondary" onclick="closeAuthModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SYNC SETUP MODAL ══════════════════════════════ -->
+<div class="modal-overlay" id="sync-modal" style="display:none" onclick="if(event.target===this)closeSyncModal()">
+  <div class="modal setup-modal">
+    <div class="modal-header">
+      <h2>⚙️ Sheet Sync Setup</h2>
+      <button class="modal-close" onclick="closeSyncModal()" title="Close">✕</button>
+    </div>
+    <div class="modal-body">
+    <div class="setup-step">
+      <p>This app syncs new registrations from your Google Sheet. Since the sheet contains PII, a <strong>Google Apps Script proxy</strong> runs as you and returns only group names + emojis — no PII ever leaves the sheet.</p>
+      <p style="margin-top:6px">Column X of the sheet stores each group's emoji. Run <strong>fillEmojis()</strong> once to auto-suggest them, then edit freely in the sheet. The web app picks up whatever you put there.</p>
+    </div>
+
+    <div class="setup-step">
+      <p><strong>Step 1.</strong> Open your spreadsheet → <strong>Extensions → Apps Script</strong>. Replace all code with this, then save:</p>
+      <div class="code-block" id="apps-script-code">// ── Column indices (0-based) ──────────────────────────
+const NAME_COL = 4;  // E: Group name
+const DESC_COL = 8;  // I: Brief description
+// Emoji column: found dynamically by header (any cell containing "emoji")
+function getEmojiCol(sheet) {
+  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  const idx = headers.findIndex(h => String(h).toLowerCase().includes('emoji'));
+  return idx >= 0 ? idx : 23; // falls back to col X if header not found
+}
+
+// ── Keyword → emoji suggestions ───────────────────────
+const KEYWORD_MAP = [
+  [/electric|electrical|kme/i,                              '⚡'],
+  [/fire.?(truck|engine|dept|department|station)|zayante/i, '🚒'],
+  [/tractor|tractors|agriculture|agricultural|ag.?history/i,'🚜'],
+  [/motorcycle|motorcycles|biker|harley|pharoah|riders.?mc/i,'🏍️'],
+  [/marine|army|navy|military|veteran|color.?guard|korean|vietnam|remembrance|memorial|corporal/i,'🎖️'],
+  [/recycle|recycling|greenwaste|green.?waste|garbage|trash/i,'♻️'],
+  [/museum|historical.?society|history.?project|heritage/i,  '🏛️'],
+  [/veterinary|mobile.?vet|beneath.?the.?redwood/i,          '🐾'],
+  [/lumber|hardware|home.?center/i,                          '🪚'],
+  [/jazz|saxophone/i,                                        '🎷'],
+  [/band|marching.?band|orchestra/i,                         '🥁'],
+  [/scout/i,                                                 '🏕️'],
+  [/little.?league|baseball/i,                               '⚾'],
+  [/softball/i,                                              '⚾'],
+  [/football|cheer/i,                                        '🏈'],
+  [/horse|horses|equestrian/i,                               '🐎'],
+  [/train|railroad|railway|locomotive|roaring.?camp/i,        '🚂'],
+  [/art.?car|virgie/i,                                       '🎨'],
+  [/van|vans|vivid|vanagon/i,                                '🌈'],
+  [/rotary/i,                                                '🔔'],
+  [/corvette|mustang|gto|camaro|studebaker|biscayne|citroen|lotus|porsche|car.?club|classic.?car/i,'🚗'],
+  [/dog|canine/i,                                            '🐕'],
+];
+
+function suggestEmoji(name, desc) {
+  const text = (name + ' ' + (desc || ''));
+  for (const [re, em] of KEYWORD_MAP) {
+    if (re.test(text)) return em;
+  }
+  return '🎪';
+}
+
+// ── Run this once to fill column X for all existing rows ──
+// Re-run any time to fill newly empty cells (won't overwrite edits).
+function fillEmojis() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+                              .getSheetByName('form responses copy');
+  if (!sheet) { Logger.log('Sheet not found'); return; }
+
+  const emojiCol = getEmojiCol(sheet);
+  const data     = sheet.getDataRange().getValues();
+  let filled = 0;
+
+  for (let i = 1; i < data.length; i++) {
+    const existing = String(data[i][emojiCol] || '').trim();
+    if (existing) continue;  // don't overwrite manual edits
+
+    const name = String(data[i][NAME_COL] || '').trim();
+    const desc = String(data[i][DESC_COL] || '').trim();
+    if (!name || name.toLowerCase() === 'n/a') continue;
+
+    sheet.getRange(i + 1, emojiCol + 1).setValue(suggestEmoji(name, desc));
+    filled++;
+  }
+  Logger.log('Filled ' + filled + ' emoji cells.');
+}
+
+// ── Web app endpoint (deploy as: Execute as Me, Anyone) ──
+function doGet(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+                              .getSheetByName('form responses copy');
+  if (!sheet) return out({ error: 'Sheet not found' }, e);
+
+  const emojiCol = getEmojiCol(sheet);
+  const rows     = sheet.getDataRange().getValues();
+  const result   = [];
+
+  for (let i = 1; i < rows.length; i++) {
+    const ts    = rows[i][0];
+    const name  = String(rows[i][NAME_COL]  || '').trim();
+    const emoji = String(rows[i][emojiCol]  || '').trim();
+    if (!name || name.toLowerCase() === 'n/a') continue;
+
+    const tsStr = ts instanceof Date
+      ? Utilities.formatDate(ts, Session.getScriptTimeZone(), 'M/d/yyyy H:mm:ss')
+      : String(ts);
+
+    result.push({ name, ts: tsStr, emoji: emoji || null });
+  }
+  return out({ rows: result }, e);
+}
+
+function out(data, e) {
+  const json = JSON.stringify(data);
+  const cb   = e && e.parameter && e.parameter.callback;
+  return ContentService
+    .createTextOutput(cb ? cb + '(' + json + ');' : json)
+    .setMimeType(cb ? ContentService.MimeType.JAVASCRIPT
+                    : ContentService.MimeType.JSON);
+}</div>
+      <button class="code-copy" onclick="copyCode()">Copy</button>
+    </div>
+
+    <div class="setup-step">
+      <p><strong>Step 2.</strong> Make sure cell <strong>X1</strong> has a header containing the word <em>emoji</em> (any capitalization — e.g. "Emoji reference", "Parade Emoji", etc.).</p>
+      <p style="margin-top:6px">Then back in Apps Script, click <strong>Run → fillEmojis</strong>. Authorize when prompted. This fills column X with suggested emojis for all existing rows. You can edit any cell in column X directly in the sheet — those edits are what the web app uses.</p>
+    </div>
+
+    <div class="setup-step">
+      <p><strong>Step 3.</strong> Click <strong>Deploy → New deployment</strong> (or <em>Manage deployments → edit → update to new version</em> if you already deployed). Set type to <strong>Web app</strong>, execute as <strong>Me</strong>, access <strong>Anyone</strong>. Deploy and authorize.</p>
+    </div>
+
+    <div class="setup-step">
+      <p><strong>Step 4.</strong> Copy the Web App URL and paste it below:</p>
+      <input class="url-input" type="url" id="script-url-input"
+             placeholder="https://script.google.com/macros/s/…/exec"
+             value="">
+      <div class="url-status" id="url-status"></div>
+    </div>
+
+    <div class="modal-btns" style="margin-top:16px">
+      <button class="btn btn-primary" style="flex:1" onclick="saveAndTestUrl()">Save &amp; Test</button>
+    </div>
+    </div><!-- modal-body -->
+  </div>
+</div>
+
+<!-- ═══ TOAST ═════════════════════════════════════════ -->
+<div class="toast hidden" id="toast"></div>
+
+<!-- ═══ LINEUP VIEW ═══════════════════════════════════ -->
+<div id="view-lineup">
+  <div class="container">
+    <div class="search-row">
+      <input class="search-input" type="search" id="search-input"
+             placeholder="🔍 Search by name or emoji…"
+             oninput="searchQuery=this.value.toLowerCase().trim();renderList()">
+      <button class="btn btn-primary" id="btn-add-float" style="display:none"
+              onclick="toggleAddForm()">+ Add</button>
+    </div>
+    <div class="float-list" id="float-list"></div>
+    <div id="add-form-wrap"></div>
+  </div>
+</div>
+
+
+<script>
+// ════════════════════════════════════════════════════════
+// CONFIG
+// ════════════════════════════════════════════════════════
+const PASSWORD        = 'felton2026';
+const STORAGE_KEY     = 'parade-emoji-v1';
+const SCRIPT_URL_KEY  = 'parade-script-url';   // localStorage key for Apps Script URL
+
+// Paste your deployed Apps Script URL here — all browsers will auto-sync without setup:
+const DEFAULT_SCRIPT_URL = '';
+
+const SAFETY_WORDS = ['horse','horses','siren','loud','animal','animals','fire','hazard',
+  'caution','warning','danger','slow','careful','fragile','live','pyro','flammable',
+  'smoke','firework','fireworks','explosive','motorcycle','motorcycles','tractor','tractors'];
+
+// ════════════════════════════════════════════════════════
+// EMOJI CATALOG
+// ════════════════════════════════════════════════════════
+const EMOJIS = [
+  {e:'🦆',n:'Duck'},    {e:'👑',n:'Crown'},   {e:'⭐',n:'Star'},     {e:'🥁',n:'Drum'},
+  {e:'🚒',n:'Firetruck'},{e:'🦄',n:'Unicorn'}, {e:'💎',n:'Diamond'},  {e:'🎈',n:'Balloon'},
+  {e:'🌈',n:'Rainbow'}, {e:'🌻',n:'Sunflower'},{e:'🦁',n:'Lion'},     {e:'🐘',n:'Elephant'},
+  {e:'🦋',n:'Butterfly'},{e:'🌺',n:'Flower'},  {e:'🎺',n:'Trumpet'},  {e:'🚗',n:'Car'},
+  {e:'🏆',n:'Trophy'},  {e:'🌙',n:'Moon'},    {e:'☀️',n:'Sun'},      {e:'🌊',n:'Wave'},
+  {e:'🦅',n:'Eagle'},   {e:'🐎',n:'Horse'},   {e:'🚂',n:'Train'},    {e:'🎭',n:'Masks'},
+  {e:'🎵',n:'Music'},   {e:'🎪',n:'Tent'},    {e:'🌲',n:'Tree'},     {e:'🍎',n:'Apple'},
+  {e:'🐝',n:'Bee'},     {e:'🦊',n:'Fox'},     {e:'🐬',n:'Dolphin'},  {e:'🦩',n:'Flamingo'},
+  {e:'🌸',n:'Blossom'}, {e:'🍁',n:'Maple'},   {e:'🎯',n:'Target'},   {e:'🌍',n:'Globe'},
+  {e:'🏔️',n:'Mountain'},{e:'🦚',n:'Peacock'}, {e:'🐠',n:'Fish'},     {e:'🎨',n:'Art'},
+  {e:'🎸',n:'Guitar'},  {e:'🏰',n:'Castle'},  {e:'🌵',n:'Cactus'},   {e:'🦜',n:'Parrot'},
+  {e:'🐻',n:'Bear'},    {e:'🌟',n:'Glow'},    {e:'🦀',n:'Crab'},     {e:'🐦',n:'Robin'},
+  {e:'🎃',n:'Pumpkin'}, {e:'🌴',n:'Palm'},    {e:'🦓',n:'Zebra'},    {e:'🦒',n:'Giraffe'},
+  {e:'🦘',n:'Kangaroo'},{e:'🐙',n:'Octopus'}, {e:'🦕',n:'Dino'},     {e:'🚀',n:'Rocket'},
+  {e:'🎠',n:'Carousel'},{e:'🎡',n:'Ferris'},  {e:'🍀',n:'Clover'},   {e:'🌷',n:'Tulip'},
+  {e:'🔔',n:'Bell'},    {e:'🎁',n:'Gift'},    {e:'🦌',n:'Deer'},     {e:'🐺',n:'Wolf'},
+  {e:'🌿',n:'Herb'},
+  // Parade-relevant additions
+  {e:'⚡',n:'Electric'},{e:'🚜',n:'Tractor'}, {e:'🏍️',n:'Moto'},    {e:'🎖️',n:'Medal'},
+  {e:'♻️',n:'Recycle'}, {e:'🏛️',n:'Pillar'},  {e:'🐾',n:'Paws'},     {e:'⚾',n:'Baseball'},
+  {e:'🏈',n:'Football'},{e:'🎷',n:'Sax'},     {e:'🏕️',n:'Camp'},    {e:'🌾',n:'Wheat'},
+  {e:'🪚',n:'Saw'},     {e:'🕊️',n:'Dove'},    {e:'🛻',n:'Pickup'},   {e:'🎻',n:'Fiddle'},
+  {e:'🏗️',n:'Crane'},  {e:'🐕',n:'Dog'},     {e:'🧲',n:'Magnet'},   {e:'🏡',n:'Home'},
+  // Fallback-pool emojis (used by Apps Script refillEmojis)
+  {e:'🎉',n:'Party'},   {e:'🎊',n:'Confetti'},{e:'💫',n:'Sparkle'},  {e:'🪗',n:'Accordion'},
+  {e:'🎢',n:'Coaster'}, {e:'🔥',n:'Fire'},    {e:'🐧',n:'Penguin'},  {e:'🏅',n:'Award'},
+  {e:'🥇',n:'Gold'},    {e:'🎋',n:'Bamboo'},  {e:'🌏',n:'Earth'},    {e:'🎑',n:'Festival'},
+  // Keyword-map emojis not previously in catalog
+  {e:'🎓',n:'School'},  {e:'💃',n:'Dance'},   {e:'✝️',n:'Faith'},    {e:'🚲',n:'Bike'},
+  {e:'🏀',n:'Basketball'},{e:'⚽',n:'Soccer'}, {e:'🎾',n:'Tennis'},   {e:'🏐',n:'Volleyball'}
+];
+
+// ════════════════════════════════════════════════════════
+// EMOJI KEYWORD MATCHING
+// ════════════════════════════════════════════════════════
+// Each entry: [ [keywords…], {e, n} ]
+// Keywords are checked against the group name (lowercase).
+// First match whose emoji isn't already used wins; falls back to sequential.
+const EMOJI_KEYWORD_MAP = [
+  [['electric','electrical','kme','lightning bolt','power co'],            {e:'⚡',n:'Electric'}],
+  [['fire truck','firetruck','fire engine','fire dept','fire department',
+    'fire station','zayante fire','fire protection'],                       {e:'🚒',n:'Firetruck'}],
+  [['tractor','tractors','farm','farming','agriculture','agricultural',
+    'ag history','harvest','ranch'],                                        {e:'🚜',n:'Tractor'}],
+  [['motorcycle','motorcycles','biker','bikers','harley','davidson',
+    'riders mc','motor club','ghost mountain','pharoah','pharoahs','moto'], {e:'🏍️',n:'Moto'}],
+  [['marine','army','navy','air force','military','veteran','veterans',
+    'color guard','vfw','american legion','korean war','vietnam',
+    'remembrance','memorial','tribute','corporal','honor guard'],           {e:'🎖️',n:'Medal'}],
+  [['recycle','recycling','greenwaste','green waste','garbage',
+    'trash truck','waste recovery','solid waste'],                          {e:'♻️',n:'Recycle'}],
+  [['museum','historical society','history project','heritage'],            {e:'🏛️',n:'Pillar'}],
+  [['veterinary','mobile vet','vet clinic','animal clinic','beneath the redwoods'], {e:'🐾',n:'Paws'}],
+  [['lumber','hardware','home center','building supply','saw mill'],        {e:'🪚',n:'Saw'}],
+  [['jazz','saxophone','sax'],                                              {e:'🎷',n:'Sax'}],
+  [['band','marching band','orchestra','brass band'],                       {e:'🥁',n:'Drum'}],
+  [['scout','scouts','cub scout','boy scout','girl scout','pack 6'],       {e:'🏕️',n:'Camp'}],
+  [['little league','baseball'],                                            {e:'⚾',n:'Baseball'}],
+  [['softball'],                                                            {e:'⚾',n:'Baseball'}],
+  [['football','cheer','cheerleading'],                                     {e:'🏈',n:'Football'}],
+  [['horse','horses','equestrian','riding','stable'],                      {e:'🐎',n:'Horse'}],
+  [['train','railroad','railway','locomotive','roaring camp'],              {e:'🚂',n:'Train'}],
+  [['art car','art','artist','virgie'],                                     {e:'🎨',n:'Art'}],
+  [['van','vans','vivid van','vanagon','volkswagen van'],                  {e:'🌈',n:'Rainbow'}],
+  [['rotary','lions club','kiwanis','service club'],                        {e:'🔔',n:'Bell'}],
+  [['dog','canine','puppy'],                                                {e:'🐕',n:'Dog'}],
+  [['classic car','car club','auto club','vintage car','gto','corvette',
+    'mustang','camaro','studebaker','biscayne','sunbeam','citroen',
+    'lotus','porsche','model a','model t'],                                 {e:'🚗',n:'Car'}],
+  [['pickup','truck','flatbed','semi'],                                     {e:'🛻',n:'Pickup'}],
+  [['lumber','construction','crane','build'],                               {e:'🏗️',n:'Crane'}],
+  [['dove','peace','remembrance'],                                          {e:'🕊️',n:'Dove'}],
+  [['trophy','champion','championship','award'],                            {e:'🏆',n:'Trophy'}],
+  [['music','musician','fiddle','violin','string'],                         {e:'🎻',n:'Fiddle'}],
+];
+
+function suggestEmoji(name, usedSet) {
+  const low = name.toLowerCase();
+  for (const [keywords, em] of EMOJI_KEYWORD_MAP) {
+    if (keywords.some(kw => low.includes(kw)) && !usedSet.has(em.e)) {
+      return em;
+    }
+  }
+  // Fall back to next unused emoji in catalog
+  return EMOJIS.find(({e}) => !usedSet.has(e)) || EMOJIS[0];
+}
+
+// ════════════════════════════════════════════════════════
+// SEED DATA  (timestamp is the dedup key — no PII stored)
+// ════════════════════════════════════════════════════════
+const SEED_GROUPS = [
+  {name:"Virgie's Art Car",                   notes:"",                                                          key:"5/18/2026 20:06:38"},
+  {name:"SLV Rotary",                         notes:"",                                                          key:"4/4/2026 9:19:01"},
+  {name:"KM Electric",                        notes:"",                                                          key:"4/7/2026 13:31:53"},
+  {name:"San Lorenzo Valley Museum",          notes:"",                                                          key:"4/7/2026 14:25:40"},
+  {name:"KORTE",                              notes:"Motorcycle on back of truck",                               key:"5/15/2026 9:12:30"},
+  {name:"Santa Cruz Jazz Society",            notes:"Keep away from loud groups and motorcycles",                key:"4/13/2026 11:18:11"},
+  {name:"Bob Elliott",                        notes:"1968 GTO convertible",                                      key:"4/13/2026 19:59:05"},
+  {name:"San Lorenzo Valley Little League",   notes:"",                                                          key:"4/16/2026 21:06:12"},
+  {name:"Marine Corps Color Guard",           notes:"",                                                          key:"4/17/2026 13:21:24"},
+  {name:"Cub Scout Pack 654",                 notes:"Usually start at Presbyterian church",                      key:"4/20/2026 17:13:00"},
+  {name:"Ghost Mountain Riders MC",           notes:"Motorcycles — must be in front of any horses!",            key:"4/21/2026 15:32:12"},
+  {name:"Jazz Society of Santa Cruz",         notes:"Keep away from motorcycles and loud participants",          key:"4/29/2026 9:45:24"},
+  {name:"Rubino",                             notes:"Solo performer",                                            key:"4/30/2026 20:13:16"},
+  {name:"San Lorenzo Valley Museum (2)",      notes:"50th anniversary — second submission, coordinate",          key:"5/4/2026 11:50:15"},
+  {name:"Glenn Merle Weber Remembrance",      notes:"Korean War veteran tribute — 2001 Ford Saleen Mustang",    key:"5/6/2026 8:56:24"},
+  {name:"Glenn Weber",                        notes:"Keep together with red Mustang — Hanson & Weber families", key:"5/6/2026 9:45:32"},
+  {name:"Agricultural History Project",       notes:"8 vintage tractors; needs parking for 8 tow vehicles/trailers", key:"5/6/2026 18:05:28"},
+  {name:"San Lorenzo Valley Girls Softball",  notes:"",                                                          key:"5/6/2026 21:01:46"},
+  {name:"BMS Group",                          notes:"1965 Sunbeam Tiger",                                        key:"5/7/2026 8:10:39"},
+  {name:"The Chabot Family",                  notes:"1950 Studebaker 2r5 pickup",                                key:"5/8/2026 11:33:11"},
+  {name:"SLVGS Mountain Dream Softball",      notes:"",                                                          key:"5/10/2026 16:07:58"},
+  {name:"Zayante Fire",                       notes:"Fire engines — loud siren at intervals",                    key:"5/11/2026 8:57:02"},
+  {name:"Roaring Camp Railroads",             notes:"1896 Kahuku Locomotive on low-boy semi — very large vehicle", key:"5/11/2026 10:18:14"},
+  {name:"Keegan Wenger",                      notes:"1925 Ford street rod — parks at Henry Cowell entrance",    key:"5/11/2026 11:13:22"},
+  {name:"Country Home Inspection & Termite",  notes:"",                                                          key:"5/11/2026 19:52:50"},
+  {name:"Beneath the Redwoods Mobile Vet",    notes:"",                                                          key:"5/12/2026 7:12:03"},
+  {name:"Roaring Camp (2)",                   notes:"1890 Baldwin locomotive on flatbed — very large vehicle",   key:"5/13/2026 13:47:04"},
+  {name:"GreenWaste Recovery",                notes:"Quakka mascot; will help set up waste sorting area",        key:"5/15/2026 11:43:08"},
+  {name:"Pharoahs — San Jose",                notes:"Keep together as San Jose chapter",                         key:"5/15/2026 15:35:13"},
+  {name:"Pharoahs — Lui Family",              notes:"Seeking veterans to ride front & center; 408-838-5307",    key:"5/15/2026 17:25:17"},
+  {name:"Pharoahs — Garrison",                notes:"",                                                          key:"5/15/2026 16:00:24"},
+  {name:"Pharoahs — Frenette",                notes:"",                                                          key:"5/15/2026 16:23:34"},
+  {name:"Pharoahs — Ted Lui",                 notes:"Veterans welcome to ride front and center",                 key:"5/15/2026 16:42:55"},
+  {name:"SLVHS Football and Cheer",           notes:"~75 participants on flatbed truck",                         key:"5/15/2026 20:23:37"},
+  {name:"Stobbe",                             notes:"1973 Lotus Europa",                                          key:"5/16/2026 10:14:18"},
+  {name:"Clark",                              notes:"1974 Citroën 2CV — SF Citroën Club",                         key:"5/16/2026 14:32:07"},
+  {name:"Schwartz (Gail)",                    notes:"1967 Chevy Camaro",                                          key:"5/16/2026 19:24:23"},
+  {name:"Schwartz (Jay)",                     notes:"1931 Ford Model A",                                          key:"5/16/2026 19:29:39"},
+  {name:"Preite",                             notes:"2016 Chevrolet Corvette Z06 convertible",                   key:"5/17/2026 12:41:34"},
+  {name:"Bargas",                             notes:"1960 Chevy Biscayne — volunteering to drive veterans",      key:"5/17/2026 14:11:27"},
+  {name:"Halley",                             notes:"1974 Porsche 914",                                           key:"5/17/2026 14:50:30"},
+  {name:"GreenWaste Recovery (2)",            notes:"Trash truck — second GreenWaste submission",                 key:"5/18/2026 14:43:46"},
+  {name:"E Clampus Vitus",                    notes:"~20 participants",                                           key:"5/18/2026 19:48:46"},
+  {name:"VIVID VANS",                         notes:"1986 VW Vanagon",                                            key:"5/18/2026 21:56:15"},
+  {name:"San Lorenzo Lumber",                 notes:"Freightliner flatbed — large vehicle",                       key:"5/19/2026 9:10:03"},
+  {name:"Baca-Murphy",                        notes:"1971 VW Super Beetle with surfboard",                        key:"5/19/2026 13:53:50"},
+  {name:"Dennis Hanson",                      notes:"Vietnam veteran tribute — 1968 GMC C1500 pickup",           key:"5/20/2026 13:54:19"},
+];
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let floats        = [];
+let authenticated = false;
+let username      = localStorage.getItem('parade-username') || '';
+let saveInFlight  = false;
+let searchQuery   = '';
+let showAddForm   = false;
+let addFormEmoji  = null;
+let addFormEname  = '';
+let editingId     = null;
+let editingPosId  = null;
+let pickerFor     = null;
+let dragSrcIdx    = null;
+let toastTimer    = null;
+let lastSyncTime  = null;
+let syncError     = false;
+let syncInFlight  = false;
+let scriptUrl     = localStorage.getItem(SCRIPT_URL_KEY) || DEFAULT_SCRIPT_URL;
+
+// ════════════════════════════════════════════════════════
+// PERSISTENCE
+// ════════════════════════════════════════════════════════
+function seedFloats() {
+  const used = new Set();
+  return SEED_GROUPS.map(g => {
+    const em = suggestEmoji(g.name, used);
+    used.add(em.e);
+    return { id: uid(), emoji: em.e, ename: em.n, name: g.name, notes: g.notes, sheetKey: g.key };
+  });
+}
+
+function load() {
+  try { const r = localStorage.getItem(STORAGE_KEY); if (r) floats = JSON.parse(r); } catch(e) {}
+  if (!Array.isArray(floats) || floats.length === 0) { floats = seedFloats(); save(); }
+}
+
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(floats)); }
+
+// ════════════════════════════════════════════════════════
+// UTILS
+// ════════════════════════════════════════════════════════
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function isSafety(n) { if (!n) return false; const l = n.toLowerCase(); return SAFETY_WORDS.some(w => l.includes(w)); }
+function usedEmojis(xId) { return floats.filter(f => f.id !== xId).map(f => f.emoji); }
+function esc(s) {
+  return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.remove('hidden');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.add('hidden'), 2400);
+}
+
+// ════════════════════════════════════════════════════════
+// GOOGLE SHEETS SYNC  (via Apps Script JSONP proxy)
+// ════════════════════════════════════════════════════════
+
+// Generic JSONP helper
+function jsonpCall(params, onSuccess, onError, timeoutMs) {
+  if (!scriptUrl) { if (onError) onError('No script URL'); return; }
+  const cbName = '_paradeCb' + Date.now();
+  const el = document.createElement('script');
+  let settled = false;
+  const timer = setTimeout(() => done(null), timeoutMs || 12000);
+
+  function done(data) {
+    if (settled) return; settled = true;
+    clearTimeout(timer); el.remove(); delete window[cbName];
+    if (!data && onError) onError('timeout');
+    else if (data && onSuccess) onSuccess(data);
+  }
+  window[cbName] = done;
+  el.onerror = () => done(null);
+  const qs = Object.entries({...params, callback: cbName})
+    .map(([k,v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+  el.src = scriptUrl + (scriptUrl.includes('?') ? '&' : '?') + qs;
+  document.head.appendChild(el);
+}
+
+function syncFromSheet() {
+  if (!scriptUrl || syncInFlight) return;
+  syncInFlight = true;
+  updateSyncUI('syncing');
+
+  jsonpCall({ action: 'load' }, finish, () => { syncInFlight = false; syncError = true; updateSyncUI('error'); });
+
+  function finish(data) {
+    syncInFlight = false;
+    if (!data || data.error) { syncError = true; updateSyncUI('error'); return; }
+
+    if (data.lock) updateLockStatus(data.lock);
+
+    const existingKeys = new Set(floats.filter(f => f.sheetKey).map(f => f.sheetKey));
+    const usedEmoji    = new Set(floats.map(f => f.emoji));
+    let added = 0, updated = 0, reordered = false;
+
+    for (const row of (data.rows || [])) {
+      if (!row.name || !row.ts) continue;
+
+      if (existingKeys.has(row.ts)) {
+        const existing = floats.find(f => f.sheetKey === row.ts);
+        if (existing) {
+          if (row.emoji && existing.emoji !== row.emoji) {
+            existing.emoji = row.emoji;
+            const cat = EMOJIS.find(x => x.e === row.emoji);
+            existing.ename = cat ? cat.n : 'Float';
+            updated++;
+          }
+          if (row.position && existing.position !== row.position) {
+            existing.position = row.position;
+            reordered = true;
+          }
+          if (row.notes !== null && row.notes !== undefined) {
+            existing.notes = row.notes;
+          }
+        }
+        continue;
+      }
+
+      // New entry
+      const name = String(row.name).trim();
+      let em;
+      if (row.emoji && !usedEmoji.has(row.emoji)) {
+        const catalogEntry = EMOJIS.find(x => x.e === row.emoji);
+        em = catalogEntry || { e: row.emoji, n: 'Float' };
+      } else {
+        em = suggestEmoji(name, usedEmoji);
+      }
+      usedEmoji.add(em.e); existingKeys.add(row.ts);
+      floats.push({ id: uid(), emoji: em.e, ename: em.n, name, notes: row.notes || '',
+                    sheetKey: row.ts, position: row.position || null });
+      added++;
+      if (row.position) reordered = true;
+    }
+
+    if (reordered) {
+      floats.sort((a, b) => {
+        if (a.position && b.position) return a.position - b.position;
+        if (a.position) return -1;
+        if (b.position) return 1;
+        return 0;
+      });
+    }
+
+    if (added > 0 || updated > 0 || reordered) {
+      save(); renderList();
+      const parts = [];
+      if (added)    parts.push(`Added ${added} new`);
+      if (updated)  parts.push(`Updated ${updated} emoji${updated>1?'s':''}`);
+      if (reordered && !added && !updated) parts.push('Order updated from sheet');
+      showToast(parts.join(' · ') + (parts.length ? ' from sheet' : ''));
+    }
+    lastSyncTime = new Date(); syncError = false; updateSyncUI('ok');
+  }
+}
+
+function updateSyncUI(state) {
+  const el = document.getElementById('sync-status');
+  if (!el) return;
+  if (!scriptUrl) { el.textContent = ''; el.title = ''; return; }
+  if (state === 'syncing') { el.textContent = '⟳ Syncing…'; el.title = ''; return; }
+  if (state === 'error') {
+    el.textContent = '⚠️ Sync failed';
+    el.title = 'Check the Apps Script URL in ⚙️ Setup, or verify the script is deployed correctly';
+    return;
+  }
+  if (lastSyncTime) {
+    const m = Math.round((Date.now() - lastSyncTime) / 60000);
+    el.textContent = m < 1 ? '✓ Just synced' : `✓ Synced ${m}m ago`;
+    el.title = `Last sync: ${lastSyncTime.toLocaleTimeString()}`;
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// SYNC SETUP MODAL
+// ════════════════════════════════════════════════════════
+function openSyncModal() {
+  document.getElementById('script-url-input').value = scriptUrl;
+  document.getElementById('url-status').textContent = '';
+  document.getElementById('sync-modal').style.display = 'flex';
+}
+function closeSyncModal() { document.getElementById('sync-modal').style.display = 'none'; }
+
+function saveAndTestUrl() {
+  const val = document.getElementById('script-url-input').value.trim();
+  const statusEl = document.getElementById('url-status');
+  if (!val) { statusEl.textContent = 'Please paste a URL.'; statusEl.className = 'url-status err'; return; }
+  if (!val.startsWith('https://script.google.com/')) {
+    statusEl.textContent = 'URL should start with https://script.google.com/…'; statusEl.className = 'url-status err'; return;
+  }
+  statusEl.textContent = 'Testing…'; statusEl.className = 'url-status';
+
+  scriptUrl = val;
+  localStorage.setItem(SCRIPT_URL_KEY, val);
+  document.getElementById('btn-sync').style.display = '';
+
+  // Quick test fetch
+  const cbName = '_paradeCbTest' + Date.now();
+  const el = document.createElement('script');
+  let done = false;
+
+  function testFinish(data) {
+    if (done) return; done = true; el.remove(); delete window[cbName];
+    if (data && data.rows) {
+      statusEl.textContent = `✓ Connected! Found ${data.rows.length} rows.`; statusEl.className = 'url-status ok';
+      syncFromSheet();
+    } else {
+      statusEl.textContent = '⚠️ Connected but got unexpected response. Check sheet name.'; statusEl.className = 'url-status err';
+    }
+  }
+  window[cbName] = testFinish;
+  el.onerror = () => { if (!done) { done = true; el.remove(); delete window[cbName]; statusEl.textContent = '⚠️ Could not reach URL. Re-check deployment settings.'; statusEl.className = 'url-status err'; } };
+  setTimeout(() => { if (!done) { done = true; el.remove(); delete window[cbName]; statusEl.textContent = '⚠️ Timed out. Check deployment settings.'; statusEl.className = 'url-status err'; } }, 10000);
+  el.src = val + (val.includes('?') ? '&' : '?') + 'callback=' + cbName;
+  document.head.appendChild(el);
+}
+
+function copyCode() {
+  const code = document.getElementById('apps-script-code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    const btn = document.querySelector('.code-copy');
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 2000);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// LOCK
+// ════════════════════════════════════════════════════════
+function acquireLock(onSuccess, onDenied) {
+  if (!scriptUrl || !username) { onSuccess(); return; }
+  jsonpCall({ action: 'acquireLock', user: username },
+    data => { if (data.success) onSuccess(); else onDenied(data.lock); },
+    ()   => { showToast('Could not reach server — editing offline'); onSuccess(); },
+    8000
+  );
+}
+
+function releaseLock() {
+  if (!scriptUrl || !username) return;
+  jsonpCall({ action: 'releaseLock', user: username }, null, null, 6000);
+}
+
+function updateLockStatus(lockInfo) {
+  const el = document.getElementById('lock-status');
+  if (!lockInfo || !lockInfo.locked || !scriptUrl) { el.style.display = 'none'; return; }
+  if (lockInfo.holder === username) { el.style.display = 'none'; return; }
+  el.style.display = '';
+  el.textContent = `🔒 ${lockInfo.holder} editing`;
+  el.title = `${lockInfo.minutesRemaining} min remaining on lock`;
+}
+
+// ════════════════════════════════════════════════════════
+// SAVE ORDER
+// ════════════════════════════════════════════════════════
+function saveOrderToSheet() {
+  if (!scriptUrl || !authenticated || saveInFlight) return;
+  saveInFlight = true;
+  const btn = document.getElementById('btn-save');
+  btn.textContent = '⏳'; btn.disabled = true;
+
+  const order = floats.filter(f => f.sheetKey).map(f => f.sheetKey).join(',');
+  jsonpCall({ action: 'saveOrder', order, user: username },
+    data => {
+      saveInFlight = false; btn.textContent = '💾 Save Order'; btn.disabled = false;
+      if (data.success) {
+        floats.filter(f => f.sheetKey).forEach((f, i) => { f.position = i + 1; });
+        save(); showToast('Order saved to sheet');
+      } else {
+        showToast('⚠️ ' + (data.error || 'Save failed'));
+      }
+    },
+    () => {
+      saveInFlight = false; btn.textContent = '💾 Save Order'; btn.disabled = false;
+      showToast('Save failed — check connection');
+    }
+  );
+}
+
+// ════════════════════════════════════════════════════════
+// AUTH
+// ════════════════════════════════════════════════════════
+function toggleAuth() {
+  if (authenticated) {
+    authenticated = false; pickerFor = null; showAddForm = false; editingId = null; editingPosId = null;
+    releaseLock();
+    updateAuthUI(); renderList(); renderAddFormContainer(); showToast('Locked — view-only mode');
+  } else {
+    document.getElementById('auth-modal').style.display = 'flex';
+    document.getElementById('user-name-input').value = username;
+    document.getElementById('pw-input').value = '';
+    document.getElementById('pw-error').style.display = 'none';
+    document.getElementById('lock-error').style.display = 'none';
+    setTimeout(() => document.getElementById(username ? 'pw-input' : 'user-name-input').focus(), 60);
+  }
+}
+
+function submitAuth() {
+  const nameVal = document.getElementById('user-name-input').value.trim();
+  if (document.getElementById('pw-input').value !== PASSWORD) {
+    document.getElementById('pw-error').style.display = 'block';
+    document.getElementById('pw-input').select();
+    return;
+  }
+  if (nameVal) { username = nameVal; localStorage.setItem('parade-username', username); }
+
+  const lockEl = document.getElementById('lock-error');
+  lockEl.style.display = 'none';
+
+  function doUnlock() {
+    authenticated = true; closeAuthModal(); updateAuthUI(); renderList();
+    showToast('Unlocked — editing enabled');
+  }
+
+  if (scriptUrl && username) {
+    acquireLock(doUnlock, lockInfo => {
+      if (lockInfo) {
+        lockEl.textContent = `⚠️ ${lockInfo.holder} is editing (${lockInfo.minutesRemaining} min remaining). Try again later.`;
+        lockEl.style.display = 'block';
+      } else {
+        showToast('Could not acquire edit lock');
+        closeAuthModal();
+      }
+    });
+  } else {
+    doUnlock();
+  }
+}
+
+function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
+
+function updateAuthUI() {
+  document.getElementById('btn-auth').textContent = authenticated ? '🔓 Lock' : '🔒 Unlock';
+  document.getElementById('btn-add-float').style.display = authenticated ? '' : 'none';
+  document.getElementById('btn-setup').style.display     = authenticated ? '' : 'none';
+  document.getElementById('btn-sync').style.display      = authenticated && scriptUrl ? '' : 'none';
+  document.getElementById('btn-save').style.display      = authenticated && scriptUrl ? '' : 'none';
+}
+
+// ════════════════════════════════════════════════════════
+// EMOJI PICKER
+// ════════════════════════════════════════════════════════
+function pickerHTML(sel, forId) {
+  const excl = usedEmojis(forId==='add' ? '__none__' : forId);
+  return `<div class="emoji-picker"><div class="emoji-picker-grid">${
+    EMOJIS.map(({e,n}) => {
+      const used = excl.includes(e), isSel = e===sel;
+      return `<button class="emoji-option${isSel?' selected':''}${used&&!isSel?' used':''}"
+        title="${esc(n)}" ${used&&!isSel?'disabled':''}
+        onclick="selectEmoji('${e}','${esc(n)}','${forId}')">${e}</button>`;
+    }).join('')
+  }</div></div>`;
+}
+
+function selectEmoji(emoji, name, forId) {
+  if (forId==='add') { addFormEmoji=emoji; addFormEname=name; pickerFor=null; renderAddFormContainer(); }
+  else {
+    const f = floats.find(f=>f.id===forId);
+    if (f) { f.emoji=emoji; f.ename=name; save(); pickerFor=null; renderList(); showToast(`Emoji updated to ${emoji}`); }
+  }
+}
+
+// ════════════════════════════════════════════════════════
+// ADD FORM
+// ════════════════════════════════════════════════════════
+function toggleAddForm() {
+  showAddForm = !showAddForm;
+  if (!showAddForm) { addFormEmoji=null; addFormEname=''; pickerFor=null; }
+  renderAddFormContainer();
+}
+
+function renderAddFormContainer() {
+  const w = document.getElementById('add-form-wrap');
+  if (!showAddForm || !authenticated) { w.innerHTML=''; return; }
+  w.innerHTML = `
+    <div class="add-form">
+      <div class="add-form-title">+ Add Float</div>
+      <div class="form-row" style="align-items:center">
+        <button class="emoji-preview-btn" onclick="togglePickerFor('add')">${addFormEmoji||'❓'}</button>
+        <input class="form-input" id="add-name"  placeholder="Group name *" maxlength="80"
+               onkeydown="if(event.key==='Enter')submitAddFloat()">
+        <input class="form-input" id="add-notes" placeholder="Notes (optional)"
+               onkeydown="if(event.key==='Enter')submitAddFloat()">
+      </div>
+      ${pickerFor==='add' ? pickerHTML(addFormEmoji,'add') : ''}
+      <div class="form-btns">
+        <button class="btn btn-primary"   onclick="submitAddFloat()">Add Float</button>
+        <button class="btn btn-secondary" onclick="toggleAddForm()">Cancel</button>
+      </div>
+    </div>`;
+}
+
+function togglePickerFor(id) {
+  pickerFor = pickerFor===id ? null : id;
+  if (id==='add') renderAddFormContainer(); else renderList();
+}
+
+function submitAddFloat() {
+  const name  = (document.getElementById('add-name')?.value  ||'').trim();
+  const notes = (document.getElementById('add-notes')?.value ||'').trim();
+  if (!name)         { showToast('Group name required'); document.getElementById('add-name')?.focus(); return; }
+  if (!addFormEmoji) { showToast('Pick an emoji first'); return; }
+  floats.push({ id:uid(), emoji:addFormEmoji, ename:addFormEname, name, notes });
+  save(); showAddForm=false; addFormEmoji=null; addFormEname=''; pickerFor=null;
+  renderList(); renderAddFormContainer(); showToast(`Added: ${addFormEmoji} ${name}`);
+}
+
+// ════════════════════════════════════════════════════════
+// POSITION EDITING
+// ════════════════════════════════════════════════════════
+function startEditPos(id) {
+  editingPosId=id; editingId=null; pickerFor=null; renderList();
+  setTimeout(() => { const el=document.getElementById(`pi-${id}`); if(el){el.focus();el.select();} }, 50);
+}
+
+function onPosKey(e, id) {
+  if (e.key==='Enter')  { e.preventDefault(); commitPos(id); }
+  if (e.key==='Escape') { editingPosId=null; renderList(); }
+}
+
+function commitPos(id) {
+  if (editingPosId!==id) return;
+  const el = document.getElementById(`pi-${id}`);
+  if (!el) { editingPosId=null; return; }
+  const newPos = parseInt(el.value, 10);
+  const cur = floats.findIndex(f=>f.id===id);
+  if (cur>=0 && !isNaN(newPos) && newPos>=1 && newPos<=floats.length && newPos!==cur+1) {
+    const [m] = floats.splice(cur,1);
+    floats.splice(newPos-1,0,m);
+    save();
+  }
+  editingPosId=null; renderList();
+}
+
+// ════════════════════════════════════════════════════════
+// FLOAT LIST RENDER
+// ════════════════════════════════════════════════════════
+function renderList() {
+  const list = document.getElementById('float-list');
+  const q = searchQuery, searching = q.length>0;
+
+  const visible = searching
+    ? floats.filter(f => f.name.toLowerCase().includes(q) || f.ename.toLowerCase().includes(q)
+        || f.emoji.includes(q) || (f.notes||'').toLowerCase().includes(q))
+    : floats;
+
+  if (!visible.length) {
+    list.innerHTML = `<div class="empty-state"><div class="big">🎪</div>
+      <p>${searching?'No floats match your search.':'No floats yet — add one!'}</p></div>`;
+    return;
+  }
+
+  list.innerHTML = visible.map(f => {
+    const idx    = floats.indexOf(f), pos = idx+1;
+    const safety = isSafety(f.notes);
+    const editP  = editingPosId===f.id;
+
+    const posBadge = editP
+      ? `<input type="number" class="pos-input" id="pi-${f.id}"
+           min="1" max="${floats.length}" value="${pos}"
+           onkeydown="onPosKey(event,'${f.id}')" onblur="commitPos('${f.id}')">`
+      : `<div class="pos-badge${authenticated?' pos-editable':''}"
+           ${authenticated?`onclick="startEditPos('${f.id}')" title="Tap to move to a new position"`:''}>
+           ${pos}</div>`;
+
+    const notesRow = f.notes
+      ? `<div class="float-notes${safety?' safety':''}">
+           ${safety?'<span>⚠️</span>':''}<span>${esc(f.notes)}</span></div>` : '';
+
+    const editForm = editingId===f.id ? `
+      <div class="edit-form">
+        <div class="form-row">
+          <input class="form-input" id="en-${f.id}" value="${esc(f.name)}"       placeholder="Group name" maxlength="80">
+          <input class="form-input" id="nt-${f.id}" value="${esc(f.notes||'')}" placeholder="Notes">
+        </div>
+        <div class="form-btns">
+          <button class="btn btn-primary btn-sm"   onclick="saveEdit('${f.id}')">Save</button>
+          <button class="btn btn-secondary btn-sm" onclick="cancelEdit()">Cancel</button>
+        </div>
+      </div>` : '';
+
+    const dragAttrs = authenticated && !searching
+      ? `draggable="true" ondragstart="onDragStart(event,${idx})" ondragover="onDragOver(event,${idx})" ondrop="onDrop(event,${idx})" ondragend="onDragEnd()"` : '';
+
+    const handle = authenticated && !searching
+      ? `<span class="drag-handle" title="Drag to reorder">⠿</span>` : '';
+
+    const actions = authenticated ? `
+      <div class="float-actions">
+        <div class="arrow-col">
+          <button class="btn-icon" ${idx===0?'disabled':''} onclick="moveFloat('${f.id}',-1)">▲</button>
+          <button class="btn-icon" ${idx===floats.length-1?'disabled':''} onclick="moveFloat('${f.id}',1)">▼</button>
+        </div>
+        <button class="btn-icon" onclick="startEdit('${f.id}')">✏️</button>
+        <button class="btn-icon" onclick="deleteFloat('${f.id}')">🗑️</button>
+      </div>` : '';
+
+    return `
+      <div class="float-card${safety?' has-safety':''}" id="card-${f.id}" ${dragAttrs}>
+        ${handle}
+        ${posBadge}
+        <div class="emoji-cell">
+          <button class="emoji-btn${authenticated?' editable':''}"
+                  title="${authenticated?'Click to change emoji':esc(f.ename)}"
+                  onclick="${authenticated?`togglePickerFor('${f.id}')`:''}">${f.emoji}</button>
+          <div class="ename">${esc(f.ename)}</div>
+        </div>
+        <div class="float-info">
+          <div class="float-name">${esc(f.name)}</div>
+          ${notesRow}${editForm}
+          ${pickerFor===f.id ? pickerHTML(f.emoji,f.id) : ''}
+        </div>
+        ${actions}
+      </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════════════════════
+// FLOAT ACTIONS
+// ════════════════════════════════════════════════════════
+function moveFloat(id, dir) {
+  const i = floats.findIndex(f=>f.id===id); if (i<0) return;
+  const n = i+dir; if (n<0||n>=floats.length) return;
+  [floats[i],floats[n]] = [floats[n],floats[i]]; save(); renderList();
+}
+
+function deleteFloat(id) {
+  const f = floats.find(f=>f.id===id); if (!f) return;
+  if (!confirm(`Delete "${f.name}" (${f.emoji})?\nThis cannot be undone.`)) return;
+  floats = floats.filter(x=>x.id!==id);
+  if (editingId===id) editingId=null; if (pickerFor===id) pickerFor=null; if (editingPosId===id) editingPosId=null;
+  save(); renderList(); showToast('Float deleted');
+}
+
+function startEdit(id) {
+  editingId=id; editingPosId=null; pickerFor=null; renderList();
+  setTimeout(()=>document.getElementById(`en-${id}`)?.focus(), 50);
+}
+function cancelEdit() { editingId=null; renderList(); }
+
+function saveEdit(id) {
+  const f = floats.find(f=>f.id===id); if (!f) return;
+  const name  = (document.getElementById(`en-${id}`)?.value||'').trim();
+  const notes = (document.getElementById(`nt-${id}`)?.value||'').trim();
+  if (!name) { showToast('Name required'); return; }
+  f.name=name; f.notes=notes; editingId=null; save(); renderList(); showToast('Saved');
+}
+
+// ════════════════════════════════════════════════════════
+// DRAG AND DROP
+// ════════════════════════════════════════════════════════
+function onDragStart(e,i) { dragSrcIdx=i; e.dataTransfer.effectAllowed='move'; setTimeout(()=>e.target.closest('.float-card')?.classList.add('dragging'),0); }
+function onDragOver(e,i)  { e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('.float-card.drag-over').forEach(el=>el.classList.remove('drag-over')); if(i!==dragSrcIdx) e.target.closest('.float-card')?.classList.add('drag-over'); }
+function onDrop(e,i)      { e.preventDefault(); if(dragSrcIdx===null||dragSrcIdx===i) return; const [m]=floats.splice(dragSrcIdx,1); floats.splice(i,0,m); dragSrcIdx=null; save(); renderList(); }
+function onDragEnd()      { dragSrcIdx=null; document.querySelectorAll('.float-card').forEach(el=>el.classList.remove('dragging','drag-over')); }
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+load();
+updateAuthUI();
+renderList();
+
+// Auto-sync on load and every 5 minutes if URL is configured
+if (scriptUrl) {
+  syncFromSheet();
+  setInterval(syncFromSheet, 5 * 60 * 1000);
+  setInterval(updateSyncUI,       60 * 1000);
+}
+
+// Close open pickers/editors when clicking outside a card
+document.addEventListener('click', e => {
+  if (!e.target.closest('.float-card') && !e.target.closest('#add-form-wrap')
+      && (pickerFor!==null || editingId!==null || editingPosId!==null)) {
+    pickerFor=null; editingId=null; editingPosId=null; renderList();
+  }
+});
+</script>
+</body>
+</html>

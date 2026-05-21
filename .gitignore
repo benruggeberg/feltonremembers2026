@@ -1,0 +1,5 @@
+# Ignore everything in the home directory except project files
+*
+!.gitignore
+!index.html
+!README.md
