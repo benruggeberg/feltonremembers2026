@@ -304,6 +304,11 @@ function out(data, e) {
     <div class="modal-btns" style="margin-top:16px">
       <button class="btn btn-primary" style="flex:1" onclick="saveAndTestUrl()">Save &amp; Test</button>
     </div>
+
+    <div class="setup-step" style="margin-top:20px;padding-top:16px;border-top:1px solid var(--gray-200)">
+      <p><strong>Troubleshooting:</strong> If your lineup looks wrong or out of date, clear this browser's local cache and pull fresh data from the sheet.</p>
+      <button class="btn btn-secondary" style="margin-top:8px;width:100%;color:var(--red);border-color:var(--red)" onclick="clearAndResync()">🗑️ Clear local data &amp; resync from sheet</button>
+    </div>
     </div><!-- modal-body -->
   </div>
 </div>
@@ -703,6 +708,13 @@ function saveAndTestUrl() {
   setTimeout(() => { if (!done) { done = true; el.remove(); delete window[cbName]; statusEl.textContent = '⚠️ Timed out. Check deployment settings.'; statusEl.className = 'url-status err'; } }, 10000);
   el.src = val + (val.includes('?') ? '&' : '?') + 'callback=' + cbName;
   document.head.appendChild(el);
+}
+
+function clearAndResync() {
+  if (!confirm('This will erase all local lineup data and reload everything from the sheet. Continue?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  closeSyncModal();
+  location.reload();
 }
 
 function copyCode() {
