@@ -438,58 +438,6 @@ function suggestEmoji(name, usedSet) {
   return EMOJIS.find(({e}) => !usedSet.has(e)) || EMOJIS[0];
 }
 
-// ════════════════════════════════════════════════════════
-// SEED DATA  (timestamp is the dedup key — no PII stored)
-// ════════════════════════════════════════════════════════
-const SEED_GROUPS = [
-  {name:"Virgie's Art Car",                   notes:"",                                                          key:"5/18/2026 20:06:38"},
-  {name:"SLV Rotary",                         notes:"",                                                          key:"4/4/2026 9:19:01"},
-  {name:"KM Electric",                        notes:"",                                                          key:"4/7/2026 13:31:53"},
-  {name:"San Lorenzo Valley Museum",          notes:"",                                                          key:"4/7/2026 14:25:40"},
-  {name:"KORTE",                              notes:"Motorcycle on back of truck",                               key:"5/15/2026 9:12:30"},
-  {name:"Santa Cruz Jazz Society",            notes:"Keep away from loud groups and motorcycles",                key:"4/13/2026 11:18:11"},
-  {name:"Bob Elliott",                        notes:"1968 GTO convertible",                                      key:"4/13/2026 19:59:05"},
-  {name:"San Lorenzo Valley Little League",   notes:"",                                                          key:"4/16/2026 21:06:12"},
-  {name:"Marine Corps Color Guard",           notes:"",                                                          key:"4/17/2026 13:21:24"},
-  {name:"Cub Scout Pack 654",                 notes:"Usually start at Presbyterian church",                      key:"4/20/2026 17:13:00"},
-  {name:"Ghost Mountain Riders MC",           notes:"Motorcycles — must be in front of any horses!",            key:"4/21/2026 15:32:12"},
-  {name:"Jazz Society of Santa Cruz",         notes:"Keep away from motorcycles and loud participants",          key:"4/29/2026 9:45:24"},
-  {name:"Rubino",                             notes:"Solo performer",                                            key:"4/30/2026 20:13:16"},
-  {name:"San Lorenzo Valley Museum (2)",      notes:"50th anniversary — second submission, coordinate",          key:"5/4/2026 11:50:15"},
-  {name:"Glenn Merle Weber Remembrance",      notes:"Korean War veteran tribute — 2001 Ford Saleen Mustang",    key:"5/6/2026 8:56:24"},
-  {name:"Glenn Weber",                        notes:"Keep together with red Mustang — Hanson & Weber families", key:"5/6/2026 9:45:32"},
-  {name:"Agricultural History Project",       notes:"8 vintage tractors; needs parking for 8 tow vehicles/trailers", key:"5/6/2026 18:05:28"},
-  {name:"San Lorenzo Valley Girls Softball",  notes:"",                                                          key:"5/6/2026 21:01:46"},
-  {name:"BMS Group",                          notes:"1965 Sunbeam Tiger",                                        key:"5/7/2026 8:10:39"},
-  {name:"The Chabot Family",                  notes:"1950 Studebaker 2r5 pickup",                                key:"5/8/2026 11:33:11"},
-  {name:"SLVGS Mountain Dream Softball",      notes:"",                                                          key:"5/10/2026 16:07:58"},
-  {name:"Zayante Fire",                       notes:"Fire engines — loud siren at intervals",                    key:"5/11/2026 8:57:02"},
-  {name:"Roaring Camp Railroads",             notes:"1896 Kahuku Locomotive on low-boy semi — very large vehicle", key:"5/11/2026 10:18:14"},
-  {name:"Keegan Wenger",                      notes:"1925 Ford street rod — parks at Henry Cowell entrance",    key:"5/11/2026 11:13:22"},
-  {name:"Country Home Inspection & Termite",  notes:"",                                                          key:"5/11/2026 19:52:50"},
-  {name:"Beneath the Redwoods Mobile Vet",    notes:"",                                                          key:"5/12/2026 7:12:03"},
-  {name:"Roaring Camp (2)",                   notes:"1890 Baldwin locomotive on flatbed — very large vehicle",   key:"5/13/2026 13:47:04"},
-  {name:"GreenWaste Recovery",                notes:"Quakka mascot; will help set up waste sorting area",        key:"5/15/2026 11:43:08"},
-  {name:"Pharoahs — San Jose",                notes:"Keep together as San Jose chapter",                         key:"5/15/2026 15:35:13"},
-  {name:"Pharoahs — Lui Family",              notes:"Seeking veterans to ride front & center; 408-838-5307",    key:"5/15/2026 17:25:17"},
-  {name:"Pharoahs — Garrison",                notes:"",                                                          key:"5/15/2026 16:00:24"},
-  {name:"Pharoahs — Frenette",                notes:"",                                                          key:"5/15/2026 16:23:34"},
-  {name:"Pharoahs — Ted Lui",                 notes:"Veterans welcome to ride front and center",                 key:"5/15/2026 16:42:55"},
-  {name:"SLVHS Football and Cheer",           notes:"~75 participants on flatbed truck",                         key:"5/15/2026 20:23:37"},
-  {name:"Stobbe",                             notes:"1973 Lotus Europa",                                          key:"5/16/2026 10:14:18"},
-  {name:"Clark",                              notes:"1974 Citroën 2CV — SF Citroën Club",                         key:"5/16/2026 14:32:07"},
-  {name:"Schwartz (Gail)",                    notes:"1967 Chevy Camaro",                                          key:"5/16/2026 19:24:23"},
-  {name:"Schwartz (Jay)",                     notes:"1931 Ford Model A",                                          key:"5/16/2026 19:29:39"},
-  {name:"Preite",                             notes:"2016 Chevrolet Corvette Z06 convertible",                   key:"5/17/2026 12:41:34"},
-  {name:"Bargas",                             notes:"1960 Chevy Biscayne — volunteering to drive veterans",      key:"5/17/2026 14:11:27"},
-  {name:"Halley",                             notes:"1974 Porsche 914",                                           key:"5/17/2026 14:50:30"},
-  {name:"GreenWaste Recovery (2)",            notes:"Trash truck — second GreenWaste submission",                 key:"5/18/2026 14:43:46"},
-  {name:"E Clampus Vitus",                    notes:"~20 participants",                                           key:"5/18/2026 19:48:46"},
-  {name:"VIVID VANS",                         notes:"1986 VW Vanagon",                                            key:"5/18/2026 21:56:15"},
-  {name:"San Lorenzo Lumber",                 notes:"Freightliner flatbed — large vehicle",                       key:"5/19/2026 9:10:03"},
-  {name:"Baca-Murphy",                        notes:"1971 VW Super Beetle with surfboard",                        key:"5/19/2026 13:53:50"},
-  {name:"Dennis Hanson",                      notes:"Vietnam veteran tribute — 1968 GMC C1500 pickup",           key:"5/20/2026 13:54:19"},
-];
 
 // ════════════════════════════════════════════════════════
 // STATE
@@ -515,18 +463,9 @@ let scriptUrl     = localStorage.getItem(SCRIPT_URL_KEY) || DEFAULT_SCRIPT_URL;
 // ════════════════════════════════════════════════════════
 // PERSISTENCE
 // ════════════════════════════════════════════════════════
-function seedFloats() {
-  const used = new Set();
-  return SEED_GROUPS.map(g => {
-    const em = suggestEmoji(g.name, used);
-    used.add(em.e);
-    return { id: uid(), emoji: em.e, ename: em.n, name: g.name, notes: g.notes, sheetKey: g.key };
-  });
-}
-
 function load() {
   try { const r = localStorage.getItem(STORAGE_KEY); if (r) floats = JSON.parse(r); } catch(e) {}
-  if (!Array.isArray(floats) || floats.length === 0) { floats = seedFloats(); save(); }
+  if (!Array.isArray(floats)) floats = [];
 }
 
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(floats)); }
