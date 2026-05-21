@@ -896,13 +896,18 @@ function commitPos(id) {
   const el = document.getElementById(`pi-${id}`);
   if (!el) { editingPosId=null; return; }
   const newPos = parseInt(el.value, 10);
+  if (!isNaN(newPos) && (newPos < 1 || newPos > floats.length)) {
+    showToast(`Position must be between 1 and ${floats.length}`);
+    el.select();
+    return;
+  }
   const cur = floats.findIndex(f=>f.id===id);
   if (cur>=0 && !isNaN(newPos) && newPos>=1 && newPos<=floats.length && newPos!==cur+1) {
     const [m] = floats.splice(cur,1);
     floats.splice(newPos-1,0,m);
-    save();
+    dirtyOrder=true; save();
   }
-  dirtyOrder=true; editingPosId=null; renderList();
+  editingPosId=null; renderList();
 }
 
 // ════════════════════════════════════════════════════════
