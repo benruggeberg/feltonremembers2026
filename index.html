@@ -151,16 +151,16 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
 <div class="modal-overlay" id="auth-modal" style="display:none" onclick="if(event.target===this)closeAuthModal()">
   <div class="modal">
     <h2>🔐 Enter Password</h2>
-    <input class="modal-input" type="text" id="user-name-input" placeholder="Your name (for edit lock)"
-           onkeydown="if(event.key==='Enter')document.getElementById('pw-input').focus()">
-    <input class="modal-input" type="password" id="pw-input" placeholder="Password"
-           onkeydown="if(event.key==='Enter')submitAuth()">
-    <div class="modal-error" id="pw-error">Incorrect password. Try again.</div>
-    <div class="modal-error" id="lock-error" style="color:var(--red)"></div>
-    <div class="modal-btns">
-      <button class="btn btn-primary" style="flex:1" onclick="submitAuth()">Unlock</button>
-      <button class="btn btn-secondary" onclick="closeAuthModal()">Cancel</button>
-    </div>
+    <form onsubmit="event.preventDefault();submitAuth()">
+      <input class="modal-input" type="text" id="user-name-input" placeholder="Your name (for edit lock)">
+      <input class="modal-input" type="password" id="pw-input" placeholder="Password">
+      <div class="modal-error" id="pw-error">Incorrect password. Try again.</div>
+      <div class="modal-error" id="lock-error" style="color:var(--red)"></div>
+      <div class="modal-btns">
+        <button type="submit" class="btn btn-primary" style="flex:1">Unlock</button>
+        <button type="button" class="btn btn-secondary" onclick="closeAuthModal()">Cancel</button>
+      </div>
+    </form>
   </div>
 </div>
 
@@ -446,6 +446,8 @@ let floats        = [];
 let authenticated = false;
 let username      = localStorage.getItem('parade-username') || '';
 let saveInFlight  = false;
+let dirtyOrder    = false;
+let lockPollTimer = null;
 let searchQuery   = '';
 let showAddForm   = false;
 let addFormEmoji  = null;
@@ -685,17 +687,32 @@ function releaseLock() {
 function updateLockStatus(lockInfo) {
   const el = document.getElementById('lock-status');
   if (!lockInfo || !lockInfo.locked || !scriptUrl) { el.style.display = 'none'; return; }
-  if (lockInfo.holder === username) { el.style.display = 'none'; return; }
+  if (lockInfo.holder === username) { el.style.display = 'none'; stopLockPolling(); return; }
   el.style.display = '';
   el.textContent = `🔒 ${lockInfo.holder} editing`;
-  el.title = `${lockInfo.minutesRemaining} min remaining on lock`;
+  el.title = `${lockInfo.minutesRemaining} min remaining`;
+  startLockPolling();
+}
+
+function startLockPolling() {
+  if (lockPollTimer || authenticated) return;
+  lockPollTimer = setInterval(pollLockStatus, 30000);
+}
+function stopLockPolling() {
+  if (lockPollTimer) { clearInterval(lockPollTimer); lockPollTimer = null; }
+}
+function pollLockStatus() {
+  if (!scriptUrl || authenticated) { stopLockPolling(); return; }
+  jsonpCall({ action: 'checkLock' }, data => {
+    if (data && data.lock) updateLockStatus(data.lock);
+  }, null, 8000);
 }
 
 // ════════════════════════════════════════════════════════
 // SAVE ORDER
 // ════════════════════════════════════════════════════════
-function saveOrderToSheet() {
-  if (!scriptUrl || !authenticated || saveInFlight) return;
+function saveOrderToSheet(onComplete) {
+  if (!scriptUrl || !authenticated || saveInFlight) { if (onComplete) onComplete(false); return; }
   saveInFlight = true;
   const btn = document.getElementById('btn-save');
   btn.textContent = '⏳'; btn.disabled = true;
@@ -706,14 +723,16 @@ function saveOrderToSheet() {
       saveInFlight = false; btn.textContent = '💾 Save Order'; btn.disabled = false;
       if (data.success) {
         floats.filter(f => f.sheetKey).forEach((f, i) => { f.position = i + 1; });
-        save(); showToast('Order saved to sheet');
+        dirtyOrder = false; save(); showToast('Order saved to sheet');
       } else {
         showToast('⚠️ ' + (data.error || 'Save failed'));
       }
+      if (onComplete) onComplete(data.success);
     },
     () => {
       saveInFlight = false; btn.textContent = '💾 Save Order'; btn.disabled = false;
       showToast('Save failed — check connection');
+      if (onComplete) onComplete(false);
     }
   );
 }
@@ -721,11 +740,23 @@ function saveOrderToSheet() {
 // ════════════════════════════════════════════════════════
 // AUTH
 // ════════════════════════════════════════════════════════
+function performLock() {
+  authenticated = false; pickerFor = null; showAddForm = false; editingId = null; editingPosId = null;
+  dirtyOrder = false;
+  releaseLock();
+  updateAuthUI(); renderList(); renderAddFormContainer(); showToast('Locked — view-only mode');
+}
+
 function toggleAuth() {
   if (authenticated) {
-    authenticated = false; pickerFor = null; showAddForm = false; editingId = null; editingPosId = null;
-    releaseLock();
-    updateAuthUI(); renderList(); renderAddFormContainer(); showToast('Locked — view-only mode');
+    if (dirtyOrder && scriptUrl) {
+      if (confirm('Save lineup order to sheet before locking?')) {
+        saveOrderToSheet(() => performLock());
+        return;
+      }
+    }
+    performLock();
+    return;
   } else {
     document.getElementById('auth-modal').style.display = 'flex';
     document.getElementById('user-name-input').value = username;
@@ -751,6 +782,7 @@ function submitAuth() {
   function doUnlock() {
     authenticated = true; closeAuthModal(); updateAuthUI(); renderList();
     showToast('Unlocked — editing enabled');
+    syncFromSheet();
   }
 
   if (scriptUrl && username) {
@@ -774,7 +806,7 @@ function updateAuthUI() {
   document.getElementById('btn-auth').textContent = authenticated ? '🔓 Lock' : '🔒 Unlock';
   document.getElementById('btn-add-float').style.display = authenticated ? '' : 'none';
   document.getElementById('btn-setup').style.display     = authenticated ? '' : 'none';
-  document.getElementById('btn-sync').style.display      = authenticated && scriptUrl ? '' : 'none';
+  document.getElementById('btn-sync').style.display      = scriptUrl ? '' : 'none';
   document.getElementById('btn-save').style.display      = authenticated && scriptUrl ? '' : 'none';
 }
 
@@ -870,7 +902,7 @@ function commitPos(id) {
     floats.splice(newPos-1,0,m);
     save();
   }
-  editingPosId=null; renderList();
+  dirtyOrder=true; editingPosId=null; renderList();
 }
 
 // ════════════════════════════════════════════════════════
@@ -962,7 +994,7 @@ function renderList() {
 function moveFloat(id, dir) {
   const i = floats.findIndex(f=>f.id===id); if (i<0) return;
   const n = i+dir; if (n<0||n>=floats.length) return;
-  [floats[i],floats[n]] = [floats[n],floats[i]]; save(); renderList();
+  [floats[i],floats[n]] = [floats[n],floats[i]]; dirtyOrder = true; save(); renderList();
 }
 
 function deleteFloat(id) {
@@ -992,7 +1024,7 @@ function saveEdit(id) {
 // ════════════════════════════════════════════════════════
 function onDragStart(e,i) { dragSrcIdx=i; e.dataTransfer.effectAllowed='move'; setTimeout(()=>e.target.closest('.float-card')?.classList.add('dragging'),0); }
 function onDragOver(e,i)  { e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('.float-card.drag-over').forEach(el=>el.classList.remove('drag-over')); if(i!==dragSrcIdx) e.target.closest('.float-card')?.classList.add('drag-over'); }
-function onDrop(e,i)      { e.preventDefault(); if(dragSrcIdx===null||dragSrcIdx===i) return; const [m]=floats.splice(dragSrcIdx,1); floats.splice(i,0,m); dragSrcIdx=null; save(); renderList(); }
+function onDrop(e,i)      { e.preventDefault(); if(dragSrcIdx===null||dragSrcIdx===i) return; const [m]=floats.splice(dragSrcIdx,1); floats.splice(i,0,m); dragSrcIdx=null; dirtyOrder=true; save(); renderList(); }
 function onDragEnd()      { dragSrcIdx=null; document.querySelectorAll('.float-card').forEach(el=>el.classList.remove('dragging','drag-over')); }
 
 // ════════════════════════════════════════════════════════
