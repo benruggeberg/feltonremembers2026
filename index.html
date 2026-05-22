@@ -103,8 +103,9 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
 /* ── FLOAT INFO ── */
 .float-info { flex:1; min-width:0; }
 .float-name { font-weight:700; font-size:0.98rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.float-notes { font-size:0.83rem; color:var(--gray-600); margin-top:3px; display:flex; align-items:flex-start; gap:4px; }
-.float-notes.safety { color:var(--red); font-weight:600; }
+.float-notes { font-size:0.83rem; color:var(--gray-600); margin-top:3px; display:flex; align-items:center; flex-wrap:wrap; gap:4px; }
+.vet-tag { color:#7c3aed; font-weight:600; }
+.safety-note { color:var(--red); font-weight:600; }
 
 /* ── EDIT / ADD FORMS ── */
 .edit-form { background:var(--gray-50); border:2px solid var(--blue); border-radius:10px; padding:10px; margin-top:8px; }
@@ -396,6 +397,7 @@ function load() {
   floats.forEach(f => {
     if (!('linkedGroupId'    in f)) f.linkedGroupId    = null;
     if (!('linkedGroupLabel' in f)) f.linkedGroupLabel = null;
+    if (!('hasVet'           in f)) f.hasVet           = false;
   });
 }
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(floats)); }
@@ -611,6 +613,7 @@ function syncFromSheet() {
             existing.position = row.position; reordered = true;
           }
           if (row.notes !== null && row.notes !== undefined) existing.notes = row.notes;
+          if (row.hasVet !== undefined) existing.hasVet = !!row.hasVet;
           if (row.group !== undefined) {
             const newLabel = row.group || null;
             if (existing.linkedGroupLabel !== newLabel) {
@@ -639,7 +642,8 @@ function syncFromSheet() {
       usedEmoji.add(em.e); existingKeys.add(row.ts);
       floats.push({ id: uid(), emoji: em.e, ename: em.n, name, notes: row.notes || '',
                     sheetKey: row.ts, position: row.position || null,
-                    linkedGroupId: groupId, linkedGroupLabel: groupLabel });
+                    linkedGroupId: groupId, linkedGroupLabel: groupLabel,
+                    hasVet: !!row.hasVet });
       added++;
       if (row.position) reordered = true;
     }
@@ -975,9 +979,12 @@ function renderCard(f, idx, context) {
     : `<div class="pos-badge${authenticated && !isMember ? ' pos-editable' : ''}"
          ${authenticated && !isMember ? `onclick="startEditPos('${f.id}')" title="Tap to set position"` : ''}>${pos}</div>`;
 
-  const notesRow = f.notes
-    ? `<div class="float-notes${safety?' safety':''}">
-         ${safety?'<span>⚠️</span>':''}<span>${esc(f.notes)}</span></div>` : '';
+  const vetBit  = f.hasVet ? `<span class="vet-tag">🎖 Has Vet</span>` : '';
+  const noteBit = f.notes
+    ? `<span class="${safety?'safety-note':''}">${safety?'⚠️ ':''}${esc(f.notes)}</span>` : '';
+  const divider = vetBit && noteBit ? `<span style="color:var(--gray-300)">|</span>` : '';
+  const notesRow = (vetBit || noteBit)
+    ? `<div class="float-notes">${vetBit}${divider}${noteBit}</div>` : '';
 
   const editForm = editingId===f.id ? `
     <div class="edit-form">
