@@ -1067,7 +1067,7 @@ function renderGroupBlock(group) {
   return `
     <div class="group-block" id="grp-${id}" ${blockAttrs}>
       <div class="group-header" ${headerAttrs}>
-        <span class="drag-handle" title="Drag group to reorder">⠿</span>
+        ${isDraggable ? `<span class="drag-handle" title="Drag group to reorder">⠿</span>` : ''}
         <div class="group-name-label">${esc(label)}</div>
         <span class="group-count">${members.length} entries</span>
         ${unlinkBtn}
