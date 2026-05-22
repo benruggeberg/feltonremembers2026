@@ -612,8 +612,12 @@ function syncFromSheet() {
           if (row.position && existing.position !== row.position) {
             existing.position = row.position; reordered = true;
           }
-          if (row.notes !== null && row.notes !== undefined) existing.notes = row.notes;
-          if (row.hasVet !== undefined) existing.hasVet = !!row.hasVet;
+          if (row.notes !== null && row.notes !== undefined && existing.notes !== row.notes) {
+            existing.notes = row.notes; updated++;
+          }
+          if (row.hasVet !== undefined && existing.hasVet !== !!row.hasVet) {
+            existing.hasVet = !!row.hasVet; updated++;
+          }
           if (row.group !== undefined) {
             const newLabel = row.group || null;
             if (existing.linkedGroupLabel !== newLabel) {
@@ -669,7 +673,7 @@ function syncFromSheet() {
       save(); renderList();
       const parts = [];
       if (added)    parts.push(`Added ${added} new`);
-      if (updated)  parts.push(`Updated ${updated} emoji${updated>1?'s':''}`);
+      if (updated)  parts.push(`Updated ${updated} entr${updated>1?'ies':'y'}`);
       if (removed)  parts.push(`Removed ${removed}`);
       if (reordered && !added && !updated && !removed) parts.push('Order updated from sheet');
       showToast(parts.join(' · ') + (parts.length ? ' from sheet' : ''));
