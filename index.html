@@ -34,6 +34,17 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
 .btn-icon:hover:not(:disabled) { background:var(--gray-200); }
 .btn-icon:disabled { opacity:0.3; cursor:not-allowed; }
 
+/* ── ACTION BAR ── */
+.action-bar { display:flex; align-items:center; gap:6px; background:var(--blue); color:white; padding:8px 12px; border-radius:10px; margin-bottom:10px; flex-wrap:wrap; }
+.action-bar .sel-label { font-size:0.85rem; font-weight:600; flex:1; min-width:60px; }
+.btn-act { padding:5px 12px; border-radius:6px; border:none; cursor:pointer; font-size:0.82rem; font-weight:600; background:rgba(255,255,255,0.2); color:white; min-height:32px; white-space:nowrap; }
+.btn-act:disabled { opacity:0.4; cursor:not-allowed; }
+.btn-act:not(:disabled):hover { background:rgba(255,255,255,0.35); }
+.btn-act.danger:not(:disabled) { background:rgba(220,38,38,0.7); }
+.btn-act.danger:not(:disabled):hover { background:rgba(220,38,38,0.9); }
+.btn-act.clear { background:transparent; border:1px solid rgba(255,255,255,0.4); }
+.btn-act.clear:hover { background:rgba(255,255,255,0.15); }
+
 /* ── VIEWS ── */
 .container { max-width:820px; margin:0 auto; padding:16px; }
 
@@ -48,8 +59,30 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
 .float-card.has-safety { border-left:4px solid var(--red); }
 .float-card.dragging { opacity:0.35; }
 .float-card.drag-over { border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-light); }
+.float-card.selected { border-color:var(--blue); background:var(--blue-light); }
 .drag-handle { cursor:grab; color:var(--gray-400); font-size:1.3rem; flex-shrink:0; padding:4px 2px; user-select:none; }
 .drag-handle:active { cursor:grabbing; }
+
+/* ── CHECKBOX ── */
+.sel-cb { width:18px; height:18px; cursor:pointer; flex-shrink:0; accent-color:var(--blue); }
+
+/* ── GROUP BLOCK ── */
+.group-block { border:2px solid var(--blue); border-radius:12px; overflow:hidden; background:white; }
+.group-block.drag-over-block { box-shadow:0 0 0 3px var(--blue-light); opacity:0.8; }
+.group-block.dragging { opacity:0.35; }
+.group-header { background:var(--blue); color:white; padding:8px 12px; display:flex; align-items:center; gap:8px; user-select:none; }
+.group-header .drag-handle { color:rgba(255,255,255,0.7); cursor:grab; }
+.group-header.drag-over-join { background:#1d4ed8; outline:2px dashed rgba(255,255,255,0.7); outline-offset:-3px; }
+.group-name-label { font-weight:700; font-size:0.95rem; flex:1; }
+.group-count { font-size:0.75rem; opacity:0.8; white-space:nowrap; }
+.btn-unlink { padding:3px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.5); cursor:pointer; font-size:0.78rem; font-weight:600; background:rgba(255,255,255,0.15); color:white; white-space:nowrap; }
+.btn-unlink:hover { background:rgba(255,255,255,0.3); }
+.group-members { padding:8px; display:flex; flex-direction:column; gap:6px; background:var(--gray-50); }
+.member-card { background:white; border:1px solid var(--gray-200); border-radius:8px; padding:8px 10px; display:flex; align-items:center; gap:8px; }
+.member-card.drag-over { border-color:var(--blue); box-shadow:0 0 0 2px var(--blue-light); }
+.member-card.dragging { opacity:0.35; }
+.member-card.selected { border-color:var(--blue); background:var(--blue-light); }
+.member-card.has-safety { border-left:3px solid var(--red); }
 
 /* ── POSITION BADGE ── */
 .pos-badge { background:var(--blue); color:white; font-weight:800; font-size:0.95rem; border-radius:8px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
@@ -72,8 +105,6 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
 .float-name { font-weight:700; font-size:0.98rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .float-notes { font-size:0.83rem; color:var(--gray-600); margin-top:3px; display:flex; align-items:flex-start; gap:4px; }
 .float-notes.safety { color:var(--red); font-weight:600; }
-.float-actions { display:flex; align-items:center; gap:4px; flex-shrink:0; }
-.arrow-col { display:flex; flex-direction:column; gap:2px; }
 
 /* ── EDIT / ADD FORMS ── */
 .edit-form { background:var(--gray-50); border:2px solid var(--blue); border-radius:10px; padding:10px; margin-top:8px; }
@@ -128,7 +159,6 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
 
 @media (max-width:520px) {
   header h1 { font-size:0.85rem; }
-  .float-actions { flex-direction:column; }
 }
 </style>
 </head>
@@ -174,127 +204,25 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
     <div class="modal-body">
     <div class="setup-step">
       <p>This app syncs new registrations from your Google Sheet. Since the sheet contains PII, a <strong>Google Apps Script proxy</strong> runs as you and returns only group names + emojis — no PII ever leaves the sheet.</p>
-      <p style="margin-top:6px">Column X of the sheet stores each group's emoji. Run <strong>fillEmojis()</strong> once to auto-suggest them, then edit freely in the sheet. The web app picks up whatever you put there.</p>
+      <p style="margin-top:6px">Column X stores emojis. Column Y stores lineup position. Column Z stores group block name. Column AA stores coordinator notes. Run <strong>fillEmojis()</strong> once to auto-suggest emojis.</p>
     </div>
 
     <div class="setup-step">
-      <p><strong>Step 1.</strong> Open your spreadsheet → <strong>Extensions → Apps Script</strong>. Replace all code with this, then save:</p>
-      <div class="code-block" id="apps-script-code">// ── Column indices (0-based) ──────────────────────────
-const NAME_COL = 4;  // E: Group name
-const DESC_COL = 8;  // I: Brief description
-// Emoji column: found dynamically by header (any cell containing "emoji")
-function getEmojiCol(sheet) {
-  const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  const idx = headers.findIndex(h => String(h).toLowerCase().includes('emoji'));
-  return idx >= 0 ? idx : 23; // falls back to col X if header not found
-}
-
-// ── Keyword → emoji suggestions ───────────────────────
-const KEYWORD_MAP = [
-  [/electric|electrical|kme/i,                              '⚡'],
-  [/fire.?(truck|engine|dept|department|station)|zayante/i, '🚒'],
-  [/tractor|tractors|agriculture|agricultural|ag.?history/i,'🚜'],
-  [/motorcycle|motorcycles|biker|harley|pharoah|riders.?mc/i,'🏍️'],
-  [/marine|army|navy|military|veteran|color.?guard|korean|vietnam|remembrance|memorial|corporal/i,'🎖️'],
-  [/recycle|recycling|greenwaste|green.?waste|garbage|trash/i,'♻️'],
-  [/museum|historical.?society|history.?project|heritage/i,  '🏛️'],
-  [/veterinary|mobile.?vet|beneath.?the.?redwood/i,          '🐾'],
-  [/lumber|hardware|home.?center/i,                          '🪚'],
-  [/jazz|saxophone/i,                                        '🎷'],
-  [/band|marching.?band|orchestra/i,                         '🥁'],
-  [/scout/i,                                                 '🏕️'],
-  [/little.?league|baseball/i,                               '⚾'],
-  [/softball/i,                                              '⚾'],
-  [/football|cheer/i,                                        '🏈'],
-  [/horse|horses|equestrian/i,                               '🐎'],
-  [/train|railroad|railway|locomotive|roaring.?camp/i,        '🚂'],
-  [/art.?car|virgie/i,                                       '🎨'],
-  [/van|vans|vivid|vanagon/i,                                '🌈'],
-  [/rotary/i,                                                '🔔'],
-  [/corvette|mustang|gto|camaro|studebaker|biscayne|citroen|lotus|porsche|car.?club|classic.?car/i,'🚗'],
-  [/dog|canine/i,                                            '🐕'],
-];
-
-function suggestEmoji(name, desc) {
-  const text = (name + ' ' + (desc || ''));
-  for (const [re, em] of KEYWORD_MAP) {
-    if (re.test(text)) return em;
-  }
-  return '🎪';
-}
-
-// ── Run this once to fill column X for all existing rows ──
-// Re-run any time to fill newly empty cells (won't overwrite edits).
-function fillEmojis() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet()
-                              .getSheetByName('form responses copy');
-  if (!sheet) { Logger.log('Sheet not found'); return; }
-
-  const emojiCol = getEmojiCol(sheet);
-  const data     = sheet.getDataRange().getValues();
-  let filled = 0;
-
-  for (let i = 1; i < data.length; i++) {
-    const existing = String(data[i][emojiCol] || '').trim();
-    if (existing) continue;  // don't overwrite manual edits
-
-    const name = String(data[i][NAME_COL] || '').trim();
-    const desc = String(data[i][DESC_COL] || '').trim();
-    if (!name || name.toLowerCase() === 'n/a') continue;
-
-    sheet.getRange(i + 1, emojiCol + 1).setValue(suggestEmoji(name, desc));
-    filled++;
-  }
-  Logger.log('Filled ' + filled + ' emoji cells.');
-}
-
-// ── Web app endpoint (deploy as: Execute as Me, Anyone) ──
-function doGet(e) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet()
-                              .getSheetByName('form responses copy');
-  if (!sheet) return out({ error: 'Sheet not found' }, e);
-
-  const emojiCol = getEmojiCol(sheet);
-  const rows     = sheet.getDataRange().getValues();
-  const result   = [];
-
-  for (let i = 1; i < rows.length; i++) {
-    const ts    = rows[i][0];
-    const name  = String(rows[i][NAME_COL]  || '').trim();
-    const emoji = String(rows[i][emojiCol]  || '').trim();
-    if (!name || name.toLowerCase() === 'n/a') continue;
-
-    const tsStr = ts instanceof Date
-      ? Utilities.formatDate(ts, Session.getScriptTimeZone(), 'M/d/yyyy H:mm:ss')
-      : String(ts);
-
-    result.push({ name, ts: tsStr, emoji: emoji || null });
-  }
-  return out({ rows: result }, e);
-}
-
-function out(data, e) {
-  const json = JSON.stringify(data);
-  const cb   = e && e.parameter && e.parameter.callback;
-  return ContentService
-    .createTextOutput(cb ? cb + '(' + json + ');' : json)
-    .setMimeType(cb ? ContentService.MimeType.JAVASCRIPT
-                    : ContentService.MimeType.JSON);
-}</div>
-      <button class="code-copy" onclick="copyCode()">Copy</button>
+      <p><strong>Step 1.</strong> Open your spreadsheet → <strong>Extensions → Apps Script</strong>. Replace all code with the current version from the project doc, then save and deploy.</p>
     </div>
 
     <div class="setup-step">
-      <p><strong>Step 2.</strong> Make sure cell <strong>X1</strong> has a header containing the word <em>emoji</em> (any capitalization — e.g. "Emoji reference", "Parade Emoji", etc.).</p>
-      <p style="margin-top:6px">Then back in Apps Script, click <strong>Run → fillEmojis</strong>. Authorize when prompted. This fills column X with suggested emojis for all existing rows. You can edit any cell in column X directly in the sheet — those edits are what the web app uses.</p>
+      <p><strong>Step 2.</strong> Make sure row 1 has these headers (exact column doesn't matter — found dynamically):</p>
+      <ul style="font-size:0.88rem;color:var(--gray-600);margin-left:16px;line-height:1.8">
+        <li>A cell containing <strong>emoji</strong> → column X</li>
+        <li>A cell containing <strong>position</strong> → column Y</li>
+        <li>A cell containing <strong>group block</strong> → column Z</li>
+        <li>A cell containing <strong>notes</strong> → column AA</li>
+      </ul>
     </div>
 
     <div class="setup-step">
-      <p><strong>Step 3.</strong> Click <strong>Deploy → New deployment</strong> (or <em>Manage deployments → edit → update to new version</em> if you already deployed). Set type to <strong>Web app</strong>, execute as <strong>Me</strong>, access <strong>Anyone</strong>. Deploy and authorize.</p>
-    </div>
-
-    <div class="setup-step">
-      <p><strong>Step 4.</strong> Copy the Web App URL and paste it below:</p>
+      <p><strong>Step 3.</strong> Deploy → New deployment. Web app, execute as Me, access Anyone. Copy the URL and paste it below:</p>
       <input class="url-input" type="url" id="script-url-input"
              placeholder="https://script.google.com/macros/s/…/exec"
              value="">
@@ -326,6 +254,14 @@ function out(data, e) {
       <button class="btn btn-primary" id="btn-add-float" style="display:none"
               onclick="toggleAddForm()">+ Add</button>
     </div>
+    <!-- ACTION BAR: appears in edit mode when 1+ cards selected -->
+    <div class="action-bar" id="action-bar" style="display:none">
+      <span class="sel-label" id="sel-count">0 selected</span>
+      <button class="btn-act danger" id="btn-del-sel" onclick="deleteSelected()" disabled>🗑 Delete</button>
+      <button class="btn-act" id="btn-edit-sel" onclick="editSelected()" disabled>✏️ Edit</button>
+      <button class="btn-act" id="btn-link-sel" onclick="linkSelected()" disabled>🔗 Link</button>
+      <button class="btn-act clear" onclick="clearSelection()">✕ Clear</button>
+    </div>
     <div class="float-list" id="float-list"></div>
     <div id="add-form-wrap"></div>
   </div>
@@ -338,9 +274,7 @@ function out(data, e) {
 // ════════════════════════════════════════════════════════
 const PASSWORD        = 'felton2026';
 const STORAGE_KEY     = 'parade-emoji-v1';
-const SCRIPT_URL_KEY  = 'parade-script-url';   // localStorage key for Apps Script URL
-
-// Paste your deployed Apps Script URL here — all browsers will auto-sync without setup:
+const SCRIPT_URL_KEY  = 'parade-script-url';
 const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZeSo0U3Oy9Sa1iPtAFXP_xIKuB8MpjeJ8G928nNIeiIdwcDPV9ssbeK1PgOpWjjS0/exec';
 
 const SAFETY_WORDS = ['horse','horses','siren','loud','animal','animals','fire','hazard',
@@ -368,17 +302,14 @@ const EMOJIS = [
   {e:'🎠',n:'Carousel'},{e:'🎡',n:'Ferris'},  {e:'🍀',n:'Clover'},   {e:'🌷',n:'Tulip'},
   {e:'🔔',n:'Bell'},    {e:'🎁',n:'Gift'},    {e:'🦌',n:'Deer'},     {e:'🐺',n:'Wolf'},
   {e:'🌿',n:'Herb'},
-  // Parade-relevant additions
   {e:'⚡',n:'Electric'},{e:'🚜',n:'Tractor'}, {e:'🏍️',n:'Moto'},    {e:'🎖️',n:'Medal'},
   {e:'♻️',n:'Recycle'}, {e:'🏛️',n:'Pillar'},  {e:'🐾',n:'Paws'},     {e:'⚾',n:'Baseball'},
   {e:'🏈',n:'Football'},{e:'🎷',n:'Sax'},     {e:'🏕️',n:'Camp'},    {e:'🌾',n:'Wheat'},
   {e:'🪚',n:'Saw'},     {e:'🕊️',n:'Dove'},    {e:'🛻',n:'Pickup'},   {e:'🎻',n:'Fiddle'},
   {e:'🏗️',n:'Crane'},  {e:'🐕',n:'Dog'},     {e:'🧲',n:'Magnet'},   {e:'🏡',n:'Home'},
-  // Fallback-pool emojis (used by Apps Script refillEmojis)
   {e:'🎉',n:'Party'},   {e:'🎊',n:'Confetti'},{e:'💫',n:'Sparkle'},  {e:'🪗',n:'Accordion'},
   {e:'🎢',n:'Coaster'}, {e:'🔥',n:'Fire'},    {e:'🐧',n:'Penguin'},  {e:'🏅',n:'Award'},
   {e:'🥇',n:'Gold'},    {e:'🎋',n:'Bamboo'},  {e:'🌏',n:'Earth'},    {e:'🎑',n:'Festival'},
-  // Keyword-map emojis not previously in catalog
   {e:'🎓',n:'School'},  {e:'💃',n:'Dance'},   {e:'✝️',n:'Faith'},    {e:'🚲',n:'Bike'},
   {e:'🏀',n:'Basketball'},{e:'⚽',n:'Soccer'}, {e:'🎾',n:'Tennis'},   {e:'🏐',n:'Volleyball'}
 ];
@@ -386,9 +317,6 @@ const EMOJIS = [
 // ════════════════════════════════════════════════════════
 // EMOJI KEYWORD MATCHING
 // ════════════════════════════════════════════════════════
-// Each entry: [ [keywords…], {e, n} ]
-// Keywords are checked against the group name (lowercase).
-// First match whose emoji isn't already used wins; falls back to sequential.
 const EMOJI_KEYWORD_MAP = [
   [['electric','electrical','kme','lightning bolt','power co'],            {e:'⚡',n:'Electric'}],
   [['fire truck','firetruck','fire engine','fire dept','fire department',
@@ -421,8 +349,8 @@ const EMOJI_KEYWORD_MAP = [
     'mustang','camaro','studebaker','biscayne','sunbeam','citroen',
     'lotus','porsche','model a','model t'],                                 {e:'🚗',n:'Car'}],
   [['pickup','truck','flatbed','semi'],                                     {e:'🛻',n:'Pickup'}],
-  [['lumber','construction','crane','build'],                               {e:'🏗️',n:'Crane'}],
-  [['dove','peace','remembrance'],                                          {e:'🕊️',n:'Dove'}],
+  [['crane','build'],                                                       {e:'🏗️',n:'Crane'}],
+  [['dove','peace'],                                                        {e:'🕊️',n:'Dove'}],
   [['trophy','champion','championship','award'],                            {e:'🏆',n:'Trophy'}],
   [['music','musician','fiddle','violin','string'],                         {e:'🎻',n:'Fiddle'}],
 ];
@@ -430,14 +358,10 @@ const EMOJI_KEYWORD_MAP = [
 function suggestEmoji(name, usedSet) {
   const low = name.toLowerCase();
   for (const [keywords, em] of EMOJI_KEYWORD_MAP) {
-    if (keywords.some(kw => low.includes(kw)) && !usedSet.has(em.e)) {
-      return em;
-    }
+    if (keywords.some(kw => low.includes(kw)) && !usedSet.has(em.e)) return em;
   }
-  // Fall back to next unused emoji in catalog
   return EMOJIS.find(({e}) => !usedSet.has(e)) || EMOJIS[0];
 }
-
 
 // ════════════════════════════════════════════════════════
 // STATE
@@ -455,12 +379,13 @@ let addFormEname  = '';
 let editingId     = null;
 let editingPosId  = null;
 let pickerFor     = null;
-let dragSrcIdx    = null;
 let toastTimer    = null;
 let lastSyncTime  = null;
 let syncError     = false;
 let syncInFlight  = false;
 let scriptUrl     = localStorage.getItem(SCRIPT_URL_KEY) || DEFAULT_SCRIPT_URL;
+let selectedIds   = new Set();
+let dragState     = {};  // { type:'float'|'group'|'member', floatId, groupId }
 
 // ════════════════════════════════════════════════════════
 // PERSISTENCE
@@ -468,8 +393,11 @@ let scriptUrl     = localStorage.getItem(SCRIPT_URL_KEY) || DEFAULT_SCRIPT_URL;
 function load() {
   try { const r = localStorage.getItem(STORAGE_KEY); if (r) floats = JSON.parse(r); } catch(e) {}
   if (!Array.isArray(floats)) floats = [];
+  floats.forEach(f => {
+    if (!('linkedGroupId'    in f)) f.linkedGroupId    = null;
+    if (!('linkedGroupLabel' in f)) f.linkedGroupLabel = null;
+  });
 }
-
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(floats)); }
 
 // ════════════════════════════════════════════════════════
@@ -488,17 +416,150 @@ function showToast(msg) {
 }
 
 // ════════════════════════════════════════════════════════
-// GOOGLE SHEETS SYNC  (via Apps Script JSONP proxy)
+// GROUP HELPERS
 // ════════════════════════════════════════════════════════
 
-// Generic JSONP helper
+// Build rendering list: groups must be contiguous in floats array.
+function buildTopLevel() {
+  const items = [];
+  let i = 0;
+  while (i < floats.length) {
+    const f = floats[i];
+    if (!f.linkedGroupId) {
+      items.push({ type: 'float', f, idx: i });
+      i++;
+    } else {
+      const gid   = f.linkedGroupId;
+      const label = f.linkedGroupLabel || gid;
+      const members = [];
+      while (i < floats.length && floats[i].linkedGroupId === gid) {
+        members.push({ f: floats[i], idx: i });
+        i++;
+      }
+      items.push({ type: 'group', id: gid, label, members });
+    }
+  }
+  return items;
+}
+
+// After assigning linkedGroupId, ensure all members of each group are contiguous.
+function ensureGroupsContiguous() {
+  const groupOrder  = [];
+  const groupMap    = {};
+  const seen        = new Set();
+  const result      = [];
+
+  for (const f of floats) {
+    if (!f.linkedGroupId) { result.push(f); continue; }
+    if (!seen.has(f.linkedGroupId)) {
+      seen.add(f.linkedGroupId);
+      groupOrder.push(f.linkedGroupId);
+      groupMap[f.linkedGroupId] = [];
+    }
+    groupMap[f.linkedGroupId].push(f);
+  }
+
+  // Re-insert: walk result (which already has standalone in order), then splice in groups
+  // Simpler: rebuild by scanning original float order, output standalone immediately,
+  // output group block on first encounter.
+  const out = []; const emitted = new Set();
+  for (const f of floats) {
+    if (!f.linkedGroupId) { out.push(f); }
+    else if (!emitted.has(f.linkedGroupId)) {
+      emitted.add(f.linkedGroupId);
+      out.push(...groupMap[f.linkedGroupId]);
+    }
+  }
+  floats = out;
+}
+
+// ════════════════════════════════════════════════════════
+// SELECTION
+// ════════════════════════════════════════════════════════
+function toggleSelect(id, e) {
+  if (e) e.stopPropagation();
+  if (selectedIds.has(id)) selectedIds.delete(id); else selectedIds.add(id);
+  updateActionBar(); renderList();
+}
+
+function clearSelection() {
+  selectedIds.clear(); updateActionBar(); renderList();
+}
+
+function updateActionBar() {
+  const bar   = document.getElementById('action-bar');
+  const count = selectedIds.size;
+  if (!authenticated || count === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  document.getElementById('sel-count').textContent     = `${count} selected`;
+  document.getElementById('btn-del-sel').disabled      = count < 1;
+  document.getElementById('btn-edit-sel').disabled     = count !== 1;
+  document.getElementById('btn-link-sel').disabled     = count < 2;
+}
+
+// ════════════════════════════════════════════════════════
+// SELECTION ACTIONS
+// ════════════════════════════════════════════════════════
+function deleteSelected() {
+  const ids   = [...selectedIds];
+  const names = ids.map(id => floats.find(f => f.id === id)?.name).filter(Boolean);
+  const preview = names.slice(0,3).join(', ') + (names.length > 3 ? '…' : '');
+  if (!confirm(`Delete ${ids.length} entr${ids.length > 1 ? 'ies' : 'y'} (${preview})?\nThis cannot be undone.`)) return;
+  floats = floats.filter(f => !selectedIds.has(f.id));
+  selectedIds.clear();
+  if (editingId && !floats.find(f => f.id === editingId)) editingId = null;
+  if (pickerFor  && !floats.find(f => f.id === pickerFor))  pickerFor  = null;
+  dirtyOrder = true; save(); updateActionBar(); renderList();
+  showToast(`Deleted ${ids.length} entr${ids.length > 1 ? 'ies' : 'y'}`);
+}
+
+function editSelected() {
+  if (selectedIds.size !== 1) return;
+  const id = [...selectedIds][0];
+  editingId = id; editingPosId = null; pickerFor = null;
+  renderList();
+  setTimeout(() => document.getElementById(`en-${id}`)?.focus(), 50);
+}
+
+function linkSelected() {
+  if (selectedIds.size < 2) return;
+  // Pre-fill with existing group name if all selected are from same group
+  const existingLabels = new Set([...selectedIds].map(id => floats.find(f=>f.id===id)?.linkedGroupLabel).filter(Boolean));
+  const defaultName = existingLabels.size === 1 ? [...existingLabels][0] : '';
+  const label = prompt('Enter a name for this linked group:', defaultName);
+  if (!label || !label.trim()) return;
+  const groupLabel = label.trim();
+
+  // Reuse existing groupId if renaming, otherwise create new
+  let groupId = existingLabels.size === 1
+    ? (floats.find(f => f.linkedGroupLabel === [...existingLabels][0])?.linkedGroupId || uid())
+    : uid();
+
+  [...selectedIds].forEach(id => {
+    const f = floats.find(x => x.id === id);
+    if (f) { f.linkedGroupId = groupId; f.linkedGroupLabel = groupLabel; }
+  });
+
+  ensureGroupsContiguous();
+  selectedIds.clear();
+  dirtyOrder = true; save(); updateActionBar(); renderList(); showToast(`Linked as "${groupLabel}"`);
+}
+
+function unlinkGroup(groupId) {
+  const label = floats.find(f => f.linkedGroupId === groupId)?.linkedGroupLabel || groupId;
+  floats.forEach(f => { if (f.linkedGroupId === groupId) { f.linkedGroupId = null; f.linkedGroupLabel = null; } });
+  dirtyOrder = true; save(); renderList(); showToast(`Unlinked "${label}"`);
+}
+
+// ════════════════════════════════════════════════════════
+// GOOGLE SHEETS SYNC  (via Apps Script JSONP proxy)
+// ════════════════════════════════════════════════════════
 function jsonpCall(params, onSuccess, onError, timeoutMs) {
   if (!scriptUrl) { if (onError) onError('No script URL'); return; }
   const cbName = '_paradeCb' + Date.now();
   const el = document.createElement('script');
   let settled = false;
   const timer = setTimeout(() => done(null), timeoutMs || 12000);
-
   function done(data) {
     if (settled) return; settled = true;
     clearTimeout(timer); el.remove(); delete window[cbName];
@@ -526,6 +587,10 @@ function syncFromSheet() {
 
     if (data.lock) updateLockStatus(data.lock);
 
+    // Build label→groupId mapping from current floats to preserve IDs across syncs
+    const labelToGroupId = {};
+    floats.forEach(f => { if (f.linkedGroupId && f.linkedGroupLabel) labelToGroupId[f.linkedGroupLabel] = f.linkedGroupId; });
+
     const existingKeys = new Set(floats.filter(f => f.sheetKey).map(f => f.sheetKey));
     const usedEmoji    = new Set(floats.map(f => f.emoji));
     let added = 0, updated = 0, reordered = false;
@@ -543,11 +608,16 @@ function syncFromSheet() {
             updated++;
           }
           if (row.position && existing.position !== row.position) {
-            existing.position = row.position;
-            reordered = true;
+            existing.position = row.position; reordered = true;
           }
-          if (row.notes !== null && row.notes !== undefined) {
-            existing.notes = row.notes;
+          if (row.notes !== null && row.notes !== undefined) existing.notes = row.notes;
+          if (row.group !== undefined) {
+            const newLabel = row.group || null;
+            if (existing.linkedGroupLabel !== newLabel) {
+              existing.linkedGroupLabel = newLabel;
+              existing.linkedGroupId    = newLabel ? (labelToGroupId[newLabel] || uid()) : null;
+              reordered = true;
+            }
           }
         }
         continue;
@@ -562,9 +632,14 @@ function syncFromSheet() {
       } else {
         em = suggestEmoji(name, usedEmoji);
       }
+      const groupLabel = row.group || null;
+      const groupId    = groupLabel ? (labelToGroupId[groupLabel] || uid()) : null;
+      if (groupLabel && groupId && !labelToGroupId[groupLabel]) labelToGroupId[groupLabel] = groupId;
+
       usedEmoji.add(em.e); existingKeys.add(row.ts);
       floats.push({ id: uid(), emoji: em.e, ename: em.n, name, notes: row.notes || '',
-                    sheetKey: row.ts, position: row.position || null });
+                    sheetKey: row.ts, position: row.position || null,
+                    linkedGroupId: groupId, linkedGroupLabel: groupLabel });
       added++;
       if (row.position) reordered = true;
     }
@@ -572,10 +647,9 @@ function syncFromSheet() {
     if (reordered) {
       floats.sort((a, b) => {
         if (a.position && b.position) return a.position - b.position;
-        if (a.position) return -1;
-        if (b.position) return 1;
-        return 0;
+        if (a.position) return -1; if (b.position) return 1; return 0;
       });
+      ensureGroupsContiguous();
     }
 
     if (added > 0 || updated > 0 || reordered) {
@@ -595,11 +669,7 @@ function updateSyncUI(state) {
   if (!el) return;
   if (!scriptUrl) { el.textContent = ''; el.title = ''; return; }
   if (state === 'syncing') { el.textContent = '⟳ Syncing…'; el.title = ''; return; }
-  if (state === 'error') {
-    el.textContent = '⚠️ Sync failed';
-    el.title = 'Check the Apps Script URL in ⚙️ Setup, or verify the script is deployed correctly';
-    return;
-  }
+  if (state === 'error')   { el.textContent = '⚠️ Sync failed'; el.title = 'Check Apps Script URL in ⚙️'; return; }
   if (lastSyncTime) {
     const m = Math.round((Date.now() - lastSyncTime) / 60000);
     el.textContent = m < 1 ? '✓ Just synced' : `✓ Synced ${m}m ago`;
@@ -625,28 +695,25 @@ function saveAndTestUrl() {
     statusEl.textContent = 'URL should start with https://script.google.com/…'; statusEl.className = 'url-status err'; return;
   }
   statusEl.textContent = 'Testing…'; statusEl.className = 'url-status';
-
   scriptUrl = val;
   localStorage.setItem(SCRIPT_URL_KEY, val);
   document.getElementById('btn-sync').style.display = '';
 
-  // Quick test fetch
   const cbName = '_paradeCbTest' + Date.now();
   const el = document.createElement('script');
   let done = false;
-
   function testFinish(data) {
     if (done) return; done = true; el.remove(); delete window[cbName];
     if (data && data.rows) {
       statusEl.textContent = `✓ Connected! Found ${data.rows.length} rows.`; statusEl.className = 'url-status ok';
       syncFromSheet();
     } else {
-      statusEl.textContent = '⚠️ Connected but got unexpected response. Check sheet name.'; statusEl.className = 'url-status err';
+      statusEl.textContent = '⚠️ Connected but got unexpected response.'; statusEl.className = 'url-status err';
     }
   }
   window[cbName] = testFinish;
-  el.onerror = () => { if (!done) { done = true; el.remove(); delete window[cbName]; statusEl.textContent = '⚠️ Could not reach URL. Re-check deployment settings.'; statusEl.className = 'url-status err'; } };
-  setTimeout(() => { if (!done) { done = true; el.remove(); delete window[cbName]; statusEl.textContent = '⚠️ Timed out. Check deployment settings.'; statusEl.className = 'url-status err'; } }, 10000);
+  el.onerror = () => { if (!done) { done=true; el.remove(); delete window[cbName]; statusEl.textContent='⚠️ Could not reach URL.'; statusEl.className='url-status err'; } };
+  setTimeout(()=>{ if (!done) { done=true; el.remove(); delete window[cbName]; statusEl.textContent='⚠️ Timed out.'; statusEl.className='url-status err'; }}, 10000);
   el.src = val + (val.includes('?') ? '&' : '?') + 'callback=' + cbName;
   document.head.appendChild(el);
 }
@@ -658,15 +725,6 @@ function clearAndResync() {
   location.reload();
 }
 
-function copyCode() {
-  const code = document.getElementById('apps-script-code').textContent;
-  navigator.clipboard.writeText(code).then(() => {
-    const btn = document.querySelector('.code-copy');
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 2000);
-  });
-}
-
 // ════════════════════════════════════════════════════════
 // LOCK
 // ════════════════════════════════════════════════════════
@@ -674,26 +732,20 @@ function acquireLock(onSuccess, onDenied) {
   if (!scriptUrl || !username) { onSuccess(); return; }
   jsonpCall({ action: 'acquireLock', user: username },
     data => { if (data.success) onSuccess(); else onDenied(data.lock); },
-    ()   => { showToast('Could not reach server — editing offline'); onSuccess(); },
-    8000
-  );
+    ()   => { showToast('Could not reach server — editing offline'); onSuccess(); }, 8000);
 }
-
 function releaseLock() {
   if (!scriptUrl || !username) return;
   jsonpCall({ action: 'releaseLock', user: username }, null, null, 6000);
 }
-
 function updateLockStatus(lockInfo) {
   const el = document.getElementById('lock-status');
-  if (!lockInfo || !lockInfo.locked || !scriptUrl) { el.style.display = 'none'; return; }
-  if (lockInfo.holder === username) { el.style.display = 'none'; stopLockPolling(); return; }
-  el.style.display = '';
-  el.textContent = `🔒 ${lockInfo.holder} editing`;
+  if (!lockInfo || !lockInfo.locked || !scriptUrl) { el.style.display='none'; stopLockPolling(); return; }
+  if (lockInfo.holder === username) { el.style.display='none'; stopLockPolling(); return; }
+  el.style.display = ''; el.textContent = `🔒 ${lockInfo.holder} editing`;
   el.title = `${lockInfo.minutesRemaining} min remaining`;
   startLockPolling();
 }
-
 function startLockPolling() {
   if (lockPollTimer || authenticated) return;
   lockPollTimer = setInterval(pollLockStatus, 30000);
@@ -703,9 +755,7 @@ function stopLockPolling() {
 }
 function pollLockStatus() {
   if (!scriptUrl || authenticated) { stopLockPolling(); return; }
-  jsonpCall({ action: 'checkLock' }, data => {
-    if (data && data.lock) updateLockStatus(data.lock);
-  }, null, 8000);
+  jsonpCall({ action: 'checkLock' }, data => { if (data && data.lock) updateLockStatus(data.lock); }, null, 8000);
 }
 
 // ════════════════════════════════════════════════════════
@@ -717,16 +767,18 @@ function saveOrderToSheet(onComplete) {
   const btn = document.getElementById('btn-save');
   btn.textContent = '⏳'; btn.disabled = true;
 
-  const order = floats.filter(f => f.sheetKey).map(f => f.sheetKey).join(',');
-  jsonpCall({ action: 'saveOrder', order, user: username },
+  const sheetFloats = floats.filter(f => f.sheetKey);
+  const order = sheetFloats.map(f => f.sheetKey).join(',');
+  const groupMap = {};
+  sheetFloats.forEach(f => { groupMap[f.sheetKey] = f.linkedGroupLabel || ''; });
+
+  jsonpCall({ action: 'saveOrder', order, groups: JSON.stringify(groupMap), user: username },
     data => {
       saveInFlight = false; btn.textContent = '💾 Save Order'; btn.disabled = false;
       if (data.success) {
-        floats.filter(f => f.sheetKey).forEach((f, i) => { f.position = i + 1; });
+        sheetFloats.forEach((f, i) => { f.position = i + 1; });
         dirtyOrder = false; save(); showToast('Order saved to sheet');
-      } else {
-        showToast('⚠️ ' + (data.error || 'Save failed'));
-      }
+      } else { showToast('⚠️ ' + (data.error || 'Save failed')); }
       if (onComplete) onComplete(data.success);
     },
     () => {
@@ -741,8 +793,9 @@ function saveOrderToSheet(onComplete) {
 // AUTH
 // ════════════════════════════════════════════════════════
 function performLock() {
-  authenticated = false; pickerFor = null; showAddForm = false; editingId = null; editingPosId = null;
-  dirtyOrder = false;
+  authenticated = false; pickerFor = null; showAddForm = false;
+  editingId = null; editingPosId = null; dirtyOrder = false;
+  selectedIds.clear();
   releaseLock();
   updateAuthUI(); renderList(); renderAddFormContainer(); showToast('Locked — view-only mode');
 }
@@ -751,31 +804,26 @@ function toggleAuth() {
   if (authenticated) {
     if (dirtyOrder && scriptUrl) {
       if (confirm('Save lineup order to sheet before locking?')) {
-        saveOrderToSheet(() => performLock());
-        return;
+        saveOrderToSheet(() => performLock()); return;
       }
     }
-    performLock();
-    return;
-  } else {
-    document.getElementById('auth-modal').style.display = 'flex';
-    document.getElementById('user-name-input').value = username;
-    document.getElementById('pw-input').value = '';
-    document.getElementById('pw-error').style.display = 'none';
-    document.getElementById('lock-error').style.display = 'none';
-    setTimeout(() => document.getElementById(username ? 'pw-input' : 'user-name-input').focus(), 60);
+    performLock(); return;
   }
+  document.getElementById('auth-modal').style.display = 'flex';
+  document.getElementById('user-name-input').value = username;
+  document.getElementById('pw-input').value = '';
+  document.getElementById('pw-error').style.display   = 'none';
+  document.getElementById('lock-error').style.display = 'none';
+  setTimeout(() => document.getElementById(username ? 'pw-input' : 'user-name-input').focus(), 60);
 }
 
 function submitAuth() {
   const nameVal = document.getElementById('user-name-input').value.trim();
   if (document.getElementById('pw-input').value !== PASSWORD) {
     document.getElementById('pw-error').style.display = 'block';
-    document.getElementById('pw-input').select();
-    return;
+    document.getElementById('pw-input').select(); return;
   }
   if (nameVal) { username = nameVal; localStorage.setItem('parade-username', username); }
-
   const lockEl = document.getElementById('lock-error');
   lockEl.style.display = 'none';
 
@@ -790,20 +838,15 @@ function submitAuth() {
       if (lockInfo) {
         lockEl.textContent = `⚠️ ${lockInfo.holder} is editing (${lockInfo.minutesRemaining} min remaining). Try again later.`;
         lockEl.style.display = 'block';
-      } else {
-        showToast('Could not acquire edit lock');
-        closeAuthModal();
-      }
+      } else { showToast('Could not acquire edit lock'); closeAuthModal(); }
     });
-  } else {
-    doUnlock();
-  }
+  } else { doUnlock(); }
 }
 
 function closeAuthModal() { document.getElementById('auth-modal').style.display = 'none'; }
 
 function updateAuthUI() {
-  document.getElementById('btn-auth').textContent = authenticated ? '🔓 Lock' : '🔒 Unlock';
+  document.getElementById('btn-auth').textContent      = authenticated ? '🔓 Lock' : '🔒 Unlock';
   document.getElementById('btn-add-float').style.display = authenticated ? '' : 'none';
   document.getElementById('btn-setup').style.display     = authenticated ? '' : 'none';
   document.getElementById('btn-sync').style.display      = scriptUrl ? '' : 'none';
@@ -817,14 +860,13 @@ function pickerHTML(sel, forId) {
   const excl = usedEmojis(forId==='add' ? '__none__' : forId);
   return `<div class="emoji-picker"><div class="emoji-picker-grid">${
     EMOJIS.map(({e,n}) => {
-      const used = excl.includes(e), isSel = e===sel;
+      const used=excl.includes(e), isSel=e===sel;
       return `<button class="emoji-option${isSel?' selected':''}${used&&!isSel?' used':''}"
         title="${esc(n)}" ${used&&!isSel?'disabled':''}
         onclick="selectEmoji('${e}','${esc(n)}','${forId}')">${e}</button>`;
     }).join('')
   }</div></div>`;
 }
-
 function selectEmoji(emoji, name, forId) {
   if (forId==='add') { addFormEmoji=emoji; addFormEname=name; pickerFor=null; renderAddFormContainer(); }
   else {
@@ -841,7 +883,6 @@ function toggleAddForm() {
   if (!showAddForm) { addFormEmoji=null; addFormEname=''; pickerFor=null; }
   renderAddFormContainer();
 }
-
 function renderAddFormContainer() {
   const w = document.getElementById('add-form-wrap');
   if (!showAddForm || !authenticated) { w.innerHTML=''; return; }
@@ -862,18 +903,17 @@ function renderAddFormContainer() {
       </div>
     </div>`;
 }
-
 function togglePickerFor(id) {
   pickerFor = pickerFor===id ? null : id;
   if (id==='add') renderAddFormContainer(); else renderList();
 }
-
 function submitAddFloat() {
   const name  = (document.getElementById('add-name')?.value  ||'').trim();
   const notes = (document.getElementById('add-notes')?.value ||'').trim();
   if (!name)         { showToast('Group name required'); document.getElementById('add-name')?.focus(); return; }
   if (!addFormEmoji) { showToast('Pick an emoji first'); return; }
-  floats.push({ id:uid(), emoji:addFormEmoji, ename:addFormEname, name, notes });
+  floats.push({ id:uid(), emoji:addFormEmoji, ename:addFormEname, name, notes,
+                linkedGroupId:null, linkedGroupLabel:null });
   save(); showAddForm=false; addFormEmoji=null; addFormEname=''; pickerFor=null;
   renderList(); renderAddFormContainer(); showToast(`Added: ${addFormEmoji} ${name}`);
 }
@@ -885,29 +925,134 @@ function startEditPos(id) {
   editingPosId=id; editingId=null; pickerFor=null; renderList();
   setTimeout(() => { const el=document.getElementById(`pi-${id}`); if(el){el.focus();el.select();} }, 50);
 }
-
 function onPosKey(e, id) {
   if (e.key==='Enter')  { e.preventDefault(); commitPos(id); }
   if (e.key==='Escape') { editingPosId=null; renderList(); }
 }
-
 function commitPos(id) {
   if (editingPosId!==id) return;
   const el = document.getElementById(`pi-${id}`);
   if (!el) { editingPosId=null; return; }
   const newPos = parseInt(el.value, 10);
   if (!isNaN(newPos) && (newPos < 1 || newPos > floats.length)) {
-    showToast(`Position must be between 1 and ${floats.length}`);
-    el.select();
-    return;
+    showToast(`Position must be between 1 and ${floats.length}`); el.select(); return;
   }
   const cur = floats.findIndex(f=>f.id===id);
   if (cur>=0 && !isNaN(newPos) && newPos>=1 && newPos<=floats.length && newPos!==cur+1) {
     const [m] = floats.splice(cur,1);
     floats.splice(newPos-1,0,m);
+    ensureGroupsContiguous();
     dirtyOrder=true; save();
   }
   editingPosId=null; renderList();
+}
+
+// ════════════════════════════════════════════════════════
+// FLOAT CARD & GROUP BLOCK RENDERING
+// ════════════════════════════════════════════════════════
+function renderCard(f, idx, context) {
+  // context: 'toplevel' | 'member' | 'search'
+  const pos      = idx + 1;
+  const safety   = isSafety(f.notes);
+  const editP    = editingPosId === f.id;
+  const isMember = context === 'member';
+  const isDraggable = authenticated && context !== 'search';
+
+  const posBadge = editP
+    ? `<input type="number" class="pos-input" id="pi-${f.id}"
+         min="1" max="${floats.length}" value="${pos}"
+         onkeydown="onPosKey(event,'${f.id}')" onblur="commitPos('${f.id}')">`
+    : `<div class="pos-badge${authenticated && !isMember ? ' pos-editable' : ''}"
+         ${authenticated && !isMember ? `onclick="startEditPos('${f.id}')" title="Tap to set position"` : ''}>${pos}</div>`;
+
+  const notesRow = f.notes
+    ? `<div class="float-notes${safety?' safety':''}">
+         ${safety?'<span>⚠️</span>':''}<span>${esc(f.notes)}</span></div>` : '';
+
+  const editForm = editingId===f.id ? `
+    <div class="edit-form">
+      <div class="form-row">
+        <input class="form-input" id="en-${f.id}" value="${esc(f.name)}"       placeholder="Group name" maxlength="80">
+        <input class="form-input" id="nt-${f.id}" value="${esc(f.notes||'')}" placeholder="Notes">
+      </div>
+      <div class="form-btns">
+        <button class="btn btn-primary btn-sm"   onclick="saveEdit('${f.id}')">Save</button>
+        <button class="btn btn-secondary btn-sm" onclick="cancelEdit()">Cancel</button>
+      </div>
+    </div>` : '';
+
+  const cb = authenticated
+    ? `<input type="checkbox" class="sel-cb" ${selectedIds.has(f.id)?'checked':''}
+         onclick="toggleSelect('${f.id}',event)" title="Select">` : '';
+
+  const handle = isDraggable ? `<span class="drag-handle" title="Drag to reorder">⠿</span>` : '';
+
+  let dragAttrs = '';
+  if (isDraggable) {
+    if (isMember) {
+      dragAttrs = `draggable="true"
+        ondragstart="onMemberDragStart(event,'${f.id}')"
+        ondragover="onMemberDragOver(event,'${f.id}')"
+        ondrop="onMemberDrop(event,'${f.id}')"
+        ondragend="onDragEnd()"`;
+    } else {
+      dragAttrs = `draggable="true"
+        ondragstart="onFloatDragStart(event,'${f.id}')"
+        ondragover="onFloatDragOver(event,'${f.id}')"
+        ondrop="onFloatDrop(event,'${f.id}')"
+        ondragend="onDragEnd()"`;
+    }
+  }
+
+  const baseClass = isMember ? 'member-card' : 'float-card';
+  const cls = `${baseClass}${safety?' has-safety':''}${selectedIds.has(f.id)?' selected':''}`;
+
+  return `
+    <div class="${cls}" id="card-${f.id}" ${dragAttrs}>
+      ${cb}${handle}${posBadge}
+      <div class="emoji-cell">
+        <button class="emoji-btn${authenticated?' editable':''}"
+                title="${authenticated?'Click to change emoji':esc(f.ename)}"
+                onclick="${authenticated?`togglePickerFor('${f.id}')`:''}">${f.emoji}</button>
+        <div class="ename">${esc(f.ename)}</div>
+      </div>
+      <div class="float-info">
+        <div class="float-name">${esc(f.name)}</div>
+        ${notesRow}${editForm}
+        ${pickerFor===f.id ? pickerHTML(f.emoji,f.id) : ''}
+      </div>
+    </div>`;
+}
+
+function renderGroupBlock(group) {
+  const { id, label, members } = group;
+  const isDraggable = authenticated;
+
+  const blockAttrs = isDraggable
+    ? `ondragover="onBlockDragOver(event,'${id}')" ondrop="onBlockDrop(event,'${id}')"` : '';
+
+  const headerAttrs = isDraggable
+    ? `draggable="true"
+       ondragstart="onGroupDragStart(event,'${id}')"
+       ondragover="onGroupHeaderDragOver(event,'${id}')"
+       ondrop="onGroupHeaderDrop(event,'${id}')"
+       ondragend="onDragEnd()"` : '';
+
+  const unlinkBtn = authenticated
+    ? `<button class="btn-unlink" onclick="unlinkGroup('${esc(id)}')" title="Dissolve this group">Unlink</button>` : '';
+
+  const memberCards = members.map(({ f, idx }) => renderCard(f, idx, 'member')).join('');
+
+  return `
+    <div class="group-block" id="grp-${id}" ${blockAttrs}>
+      <div class="group-header" ${headerAttrs}>
+        <span class="drag-handle" title="Drag group to reorder">⠿</span>
+        <div class="group-name-label">${esc(label)}</div>
+        <span class="group-count">${members.length} entries</span>
+        ${unlinkBtn}
+      </div>
+      <div class="group-members">${memberCards}</div>
+    </div>`;
 }
 
 // ════════════════════════════════════════════════════════
@@ -915,107 +1060,42 @@ function commitPos(id) {
 // ════════════════════════════════════════════════════════
 function renderList() {
   const list = document.getElementById('float-list');
-  const q = searchQuery, searching = q.length>0;
+  const q = searchQuery, searching = q.length > 0;
 
-  const visible = searching
-    ? floats.filter(f => f.name.toLowerCase().includes(q) || f.ename.toLowerCase().includes(q)
-        || f.emoji.includes(q) || (f.notes||'').toLowerCase().includes(q))
-    : floats;
+  updateActionBar();
 
-  if (!visible.length) {
-    list.innerHTML = `<div class="empty-state"><div class="big">🎪</div>
-      <p>${searching?'No floats match your search.':'No floats yet — add one!'}</p></div>`;
+  if (searching) {
+    const visible = floats.filter(f =>
+      f.name.toLowerCase().includes(q) ||
+      (f.ename||'').toLowerCase().includes(q) ||
+      f.emoji.includes(q) ||
+      (f.notes||'').toLowerCase().includes(q));
+    if (!visible.length) {
+      list.innerHTML = `<div class="empty-state"><div class="big">🎪</div><p>No floats match your search.</p></div>`;
+      return;
+    }
+    list.innerHTML = visible.map(f => renderCard(f, floats.indexOf(f), 'search')).join('');
     return;
   }
 
-  list.innerHTML = visible.map(f => {
-    const idx    = floats.indexOf(f), pos = idx+1;
-    const safety = isSafety(f.notes);
-    const editP  = editingPosId===f.id;
-
-    const posBadge = editP
-      ? `<input type="number" class="pos-input" id="pi-${f.id}"
-           min="1" max="${floats.length}" value="${pos}"
-           onkeydown="onPosKey(event,'${f.id}')" onblur="commitPos('${f.id}')">`
-      : `<div class="pos-badge${authenticated?' pos-editable':''}"
-           ${authenticated?`onclick="startEditPos('${f.id}')" title="Tap to move to a new position"`:''}>
-           ${pos}</div>`;
-
-    const notesRow = f.notes
-      ? `<div class="float-notes${safety?' safety':''}">
-           ${safety?'<span>⚠️</span>':''}<span>${esc(f.notes)}</span></div>` : '';
-
-    const editForm = editingId===f.id ? `
-      <div class="edit-form">
-        <div class="form-row">
-          <input class="form-input" id="en-${f.id}" value="${esc(f.name)}"       placeholder="Group name" maxlength="80">
-          <input class="form-input" id="nt-${f.id}" value="${esc(f.notes||'')}" placeholder="Notes">
-        </div>
-        <div class="form-btns">
-          <button class="btn btn-primary btn-sm"   onclick="saveEdit('${f.id}')">Save</button>
-          <button class="btn btn-secondary btn-sm" onclick="cancelEdit()">Cancel</button>
-        </div>
-      </div>` : '';
-
-    const dragAttrs = authenticated && !searching
-      ? `draggable="true" ondragstart="onDragStart(event,${idx})" ondragover="onDragOver(event,${idx})" ondrop="onDrop(event,${idx})" ondragend="onDragEnd()"` : '';
-
-    const handle = authenticated && !searching
-      ? `<span class="drag-handle" title="Drag to reorder">⠿</span>` : '';
-
-    const actions = authenticated ? `
-      <div class="float-actions">
-        <div class="arrow-col">
-          <button class="btn-icon" ${idx===0?'disabled':''} onclick="moveFloat('${f.id}',-1)">▲</button>
-          <button class="btn-icon" ${idx===floats.length-1?'disabled':''} onclick="moveFloat('${f.id}',1)">▼</button>
-        </div>
-        <button class="btn-icon" onclick="startEdit('${f.id}')">✏️</button>
-        <button class="btn-icon" onclick="deleteFloat('${f.id}')">🗑️</button>
-      </div>` : '';
-
-    return `
-      <div class="float-card${safety?' has-safety':''}" id="card-${f.id}" ${dragAttrs}>
-        ${handle}
-        ${posBadge}
-        <div class="emoji-cell">
-          <button class="emoji-btn${authenticated?' editable':''}"
-                  title="${authenticated?'Click to change emoji':esc(f.ename)}"
-                  onclick="${authenticated?`togglePickerFor('${f.id}')`:''}">${f.emoji}</button>
-          <div class="ename">${esc(f.ename)}</div>
-        </div>
-        <div class="float-info">
-          <div class="float-name">${esc(f.name)}</div>
-          ${notesRow}${editForm}
-          ${pickerFor===f.id ? pickerHTML(f.emoji,f.id) : ''}
-        </div>
-        ${actions}
-      </div>`;
-  }).join('');
+  const topLevel = buildTopLevel();
+  if (!topLevel.length) {
+    list.innerHTML = `<div class="empty-state"><div class="big">🎪</div><p>No floats yet — add one!</p></div>`;
+    return;
+  }
+  list.innerHTML = topLevel.map(item =>
+    item.type === 'float' ? renderCard(item.f, item.idx, 'toplevel') : renderGroupBlock(item)
+  ).join('');
 }
 
 // ════════════════════════════════════════════════════════
 // FLOAT ACTIONS
 // ════════════════════════════════════════════════════════
-function moveFloat(id, dir) {
-  const i = floats.findIndex(f=>f.id===id); if (i<0) return;
-  const n = i+dir; if (n<0||n>=floats.length) return;
-  [floats[i],floats[n]] = [floats[n],floats[i]]; dirtyOrder = true; save(); renderList();
-}
-
-function deleteFloat(id) {
-  const f = floats.find(f=>f.id===id); if (!f) return;
-  if (!confirm(`Delete "${f.name}" (${f.emoji})?\nThis cannot be undone.`)) return;
-  floats = floats.filter(x=>x.id!==id);
-  if (editingId===id) editingId=null; if (pickerFor===id) pickerFor=null; if (editingPosId===id) editingPosId=null;
-  save(); renderList(); showToast('Float deleted');
-}
-
 function startEdit(id) {
   editingId=id; editingPosId=null; pickerFor=null; renderList();
   setTimeout(()=>document.getElementById(`en-${id}`)?.focus(), 50);
 }
 function cancelEdit() { editingId=null; renderList(); }
-
 function saveEdit(id) {
   const f = floats.find(f=>f.id===id); if (!f) return;
   const name  = (document.getElementById(`en-${id}`)?.value||'').trim();
@@ -1027,10 +1107,130 @@ function saveEdit(id) {
 // ════════════════════════════════════════════════════════
 // DRAG AND DROP
 // ════════════════════════════════════════════════════════
-function onDragStart(e,i) { dragSrcIdx=i; e.dataTransfer.effectAllowed='move'; setTimeout(()=>e.target.closest('.float-card')?.classList.add('dragging'),0); }
-function onDragOver(e,i)  { e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('.float-card.drag-over').forEach(el=>el.classList.remove('drag-over')); if(i!==dragSrcIdx) e.target.closest('.float-card')?.classList.add('drag-over'); }
-function onDrop(e,i)      { e.preventDefault(); if(dragSrcIdx===null||dragSrcIdx===i) return; const [m]=floats.splice(dragSrcIdx,1); floats.splice(i,0,m); dragSrcIdx=null; dirtyOrder=true; save(); renderList(); }
-function onDragEnd()      { dragSrcIdx=null; document.querySelectorAll('.float-card').forEach(el=>el.classList.remove('dragging','drag-over')); }
+function clearDragIndicators() {
+  document.querySelectorAll('.drag-over,.drag-over-block,.drag-over-join,.dragging')
+    .forEach(el => el.classList.remove('drag-over','drag-over-block','drag-over-join','dragging'));
+}
+function onDragEnd() { dragState = {}; clearDragIndicators(); }
+
+// ── Standalone float ──
+function onFloatDragStart(e, floatId) {
+  dragState = { type: 'float', floatId };
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(() => document.getElementById(`card-${floatId}`)?.classList.add('dragging'), 0);
+}
+function onFloatDragOver(e, floatId) {
+  if (!dragState.type) return;
+  e.preventDefault(); clearDragIndicators();
+  if (dragState.floatId !== floatId) document.getElementById(`card-${floatId}`)?.classList.add('drag-over');
+}
+function onFloatDrop(e, targetId) {
+  e.preventDefault(); clearDragIndicators();
+  const { type, floatId: srcId, groupId: srcGid } = dragState;
+
+  if (type === 'float' && srcId && srcId !== targetId) {
+    const [m] = floats.splice(floats.findIndex(f=>f.id===srcId), 1);
+    floats.splice(floats.findIndex(f=>f.id===targetId), 0, m);
+    dirtyOrder = true; save();
+  } else if (type === 'group' && srcGid) {
+    const members = floats.filter(f=>f.linkedGroupId===srcGid);
+    floats = floats.filter(f=>f.linkedGroupId!==srcGid);
+    const dest = floats.findIndex(f=>f.id===targetId);
+    floats.splice(dest < 0 ? floats.length : dest, 0, ...members);
+    dirtyOrder = true; save();
+  } else if (type === 'member' && srcId && srcId !== targetId) {
+    // Member dragged out of group to a standalone card's position
+    const srcF = floats.find(f=>f.id===srcId);
+    if (srcF) { srcF.linkedGroupId = null; srcF.linkedGroupLabel = null; }
+    const [m] = floats.splice(floats.findIndex(f=>f.id===srcId), 1);
+    const dest = floats.findIndex(f=>f.id===targetId);
+    floats.splice(dest < 0 ? floats.length : dest, 0, m);
+    dirtyOrder = true; save();
+  }
+  dragState = {}; renderList();
+}
+
+// ── Group block ──
+function onGroupDragStart(e, groupId) {
+  dragState = { type: 'group', groupId };
+  e.dataTransfer.effectAllowed = 'move';
+  e.stopPropagation();
+  setTimeout(() => document.getElementById(`grp-${groupId}`)?.classList.add('dragging'), 0);
+}
+function onBlockDragOver(e, groupId) {
+  if (!dragState.type || dragState.type === 'member') return;
+  e.preventDefault(); clearDragIndicators();
+  if (dragState.groupId !== groupId) document.getElementById(`grp-${groupId}`)?.classList.add('drag-over-block');
+}
+function onBlockDrop(e, targetGid) {
+  e.preventDefault(); clearDragIndicators();
+  const { type, floatId: srcId, groupId: srcGid } = dragState;
+
+  if (type === 'float' && srcId) {
+    const [m] = floats.splice(floats.findIndex(f=>f.id===srcId), 1);
+    const dest = floats.findIndex(f=>f.linkedGroupId===targetGid);
+    floats.splice(dest < 0 ? floats.length : dest, 0, m);
+    dirtyOrder = true; save();
+  } else if (type === 'group' && srcGid && srcGid !== targetGid) {
+    const members = floats.filter(f=>f.linkedGroupId===srcGid);
+    floats = floats.filter(f=>f.linkedGroupId!==srcGid);
+    const dest = floats.findIndex(f=>f.linkedGroupId===targetGid);
+    floats.splice(dest < 0 ? floats.length : dest, 0, ...members);
+    dirtyOrder = true; save();
+  }
+  dragState = {}; renderList();
+}
+
+// ── Group header: "join group" drop zone ──
+function onGroupHeaderDragOver(e, groupId) {
+  if (!dragState.type || dragState.type === 'group') return;
+  e.preventDefault(); e.stopPropagation(); clearDragIndicators();
+  document.querySelector(`#grp-${groupId} .group-header`)?.classList.add('drag-over-join');
+}
+function onGroupHeaderDrop(e, groupId) {
+  e.preventDefault(); e.stopPropagation(); clearDragIndicators();
+  const { type, floatId: srcId } = dragState;
+  if ((type === 'float' || type === 'member') && srcId) {
+    const f = floats.find(x=>x.id===srcId);
+    if (f && f.linkedGroupId !== groupId) {
+      const label = floats.find(x=>x.linkedGroupId===groupId)?.linkedGroupLabel || groupId;
+      floats.splice(floats.findIndex(x=>x.id===srcId), 1);
+      f.linkedGroupId = groupId; f.linkedGroupLabel = label;
+      // Insert after last member of the group
+      const last = floats.reduce((li, x, i) => x.linkedGroupId===groupId ? i : li, -1);
+      floats.splice(last + 1, 0, f);
+      dirtyOrder = true; save();
+    }
+  }
+  dragState = {}; renderList();
+}
+
+// ── Member card (within group) ──
+function onMemberDragStart(e, floatId) {
+  dragState = { type: 'member', floatId };
+  e.dataTransfer.effectAllowed = 'move';
+  e.stopPropagation();
+  setTimeout(() => document.getElementById(`card-${floatId}`)?.classList.add('dragging'), 0);
+}
+function onMemberDragOver(e, floatId) {
+  if (dragState.type !== 'member') return;
+  const srcGroup  = floats.find(f=>f.id===dragState.floatId)?.linkedGroupId;
+  const destGroup = floats.find(f=>f.id===floatId)?.linkedGroupId;
+  if (srcGroup !== destGroup || dragState.floatId === floatId) return;
+  e.preventDefault(); e.stopPropagation(); clearDragIndicators();
+  document.getElementById(`card-${floatId}`)?.classList.add('drag-over');
+}
+function onMemberDrop(e, targetId) {
+  const srcGroup  = floats.find(f=>f.id===dragState.floatId)?.linkedGroupId;
+  const destGroup = floats.find(f=>f.id===targetId)?.linkedGroupId;
+  if (dragState.type === 'member' && srcGroup === destGroup && dragState.floatId !== targetId) {
+    e.preventDefault(); e.stopPropagation(); clearDragIndicators();
+    const [m] = floats.splice(floats.findIndex(f=>f.id===dragState.floatId), 1);
+    floats.splice(floats.findIndex(f=>f.id===targetId), 0, m);
+    dirtyOrder = true; save(); dragState = {}; renderList();
+  }
+  // Otherwise let event bubble for cross-group or out-of-group handling
+}
 
 // ════════════════════════════════════════════════════════
 // INIT
@@ -1039,18 +1239,17 @@ load();
 updateAuthUI();
 renderList();
 
-// Auto-sync on load and every 5 minutes if URL is configured
 if (scriptUrl) {
   syncFromSheet();
   setInterval(syncFromSheet, 5 * 60 * 1000);
   setInterval(updateSyncUI,       60 * 1000);
 }
 
-// Close open pickers/editors when clicking outside a card
 document.addEventListener('click', e => {
-  if (!e.target.closest('.float-card') && !e.target.closest('#add-form-wrap')
-      && (pickerFor!==null || editingId!==null || editingPosId!==null)) {
-    pickerFor=null; editingId=null; editingPosId=null; renderList();
+  if (!e.target.closest('.float-card') && !e.target.closest('.member-card') &&
+      !e.target.closest('.group-block') && !e.target.closest('#add-form-wrap') &&
+      (pickerFor !== null || editingId !== null || editingPosId !== null)) {
+    pickerFor = null; editingId = null; editingPosId = null; renderList();
   }
 });
 </script>
