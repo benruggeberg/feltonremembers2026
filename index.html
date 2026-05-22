@@ -603,6 +603,9 @@ function syncFromSheet() {
       if (existingKeys.has(row.ts)) {
         const existing = floats.find(f => f.sheetKey === row.ts);
         if (existing) {
+          if (row.name && existing.name !== row.name) {
+            existing.name = row.name; updated++;
+          }
           if (row.emoji && existing.emoji !== row.emoji) {
             existing.emoji = row.emoji;
             const cat = EMOJIS.find(x => x.e === row.emoji);
