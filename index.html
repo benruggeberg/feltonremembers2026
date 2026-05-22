@@ -35,7 +35,7 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
 .btn-icon:disabled { opacity:0.3; cursor:not-allowed; }
 
 /* ── ACTION BAR ── */
-.action-bar { display:flex; align-items:center; gap:6px; background:var(--blue); color:white; padding:8px 12px; border-radius:10px; margin-bottom:10px; flex-wrap:wrap; }
+.action-bar { display:flex; align-items:center; gap:6px; background:var(--blue); color:white; padding:8px 12px; border-radius:10px; margin-bottom:10px; flex-wrap:wrap; position:sticky; top:64px; z-index:90; box-shadow:var(--shadow-md); }
 .action-bar .sel-label { font-size:0.85rem; font-weight:600; flex:1; min-width:60px; }
 .btn-act { padding:5px 12px; border-radius:6px; border:none; cursor:pointer; font-size:0.82rem; font-weight:600; background:rgba(255,255,255,0.2); color:white; min-height:32px; white-space:nowrap; }
 .btn-act:disabled { opacity:0.4; cursor:not-allowed; }
