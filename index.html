@@ -644,6 +644,15 @@ function syncFromSheet() {
       if (row.position) reordered = true;
     }
 
+    // Remove floats whose sheetKey no longer exists in the sheet
+    const sheetKeySet = new Set((data.rows || []).map(r => r.ts).filter(Boolean));
+    const before = floats.length;
+    floats = floats.filter(f => !f.sheetKey || sheetKeySet.has(f.sheetKey));
+    const removed = before - floats.length;
+    if (removed > 0) {
+      [...selectedIds].forEach(id => { if (!floats.find(f => f.id === id)) selectedIds.delete(id); });
+    }
+
     if (reordered) {
       floats.sort((a, b) => {
         if (a.position && b.position) return a.position - b.position;
@@ -652,12 +661,13 @@ function syncFromSheet() {
       ensureGroupsContiguous();
     }
 
-    if (added > 0 || updated > 0 || reordered) {
+    if (added > 0 || updated > 0 || reordered || removed > 0) {
       save(); renderList();
       const parts = [];
       if (added)    parts.push(`Added ${added} new`);
       if (updated)  parts.push(`Updated ${updated} emoji${updated>1?'s':''}`);
-      if (reordered && !added && !updated) parts.push('Order updated from sheet');
+      if (removed)  parts.push(`Removed ${removed}`);
+      if (reordered && !added && !updated && !removed) parts.push('Order updated from sheet');
       showToast(parts.join(' · ') + (parts.length ? ' from sheet' : ''));
     }
     lastSyncTime = new Date(); syncError = false; updateSyncUI('ok');
