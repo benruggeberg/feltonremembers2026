@@ -1307,10 +1307,12 @@ function generatePrintWindow(rows) {
     const y = String(year||'').trim(), mk = String(make||'').trim(), mo = String(model||'').trim();
     const parts = [y, mk, mo].filter(Boolean);
     if (!parts.length) return '';
-    // De-duplicate identical fields (e.g. Roaring Camp fills all three with same text)
-    if (parts.every(p => p === parts[0])) return parts[0];
+    if (parts.every(p => p === parts[0])) return parts[0]; // de-dupe identical fields
     return parts.join(' ');
   }
+
+  // Strip manually-appended vehicle details from group names (e.g. "Stobbe - 1973 Lotus Europa" → "Stobbe")
+  function displayName(n) { return n.includes(' - ') ? n.split(' - ')[0].trim() : n; }
 
   const tbody = rows.map(r => {
     const em  = r.emoji || '';
@@ -1320,7 +1322,7 @@ function generatePrintWindow(rows) {
       <td class="cp">${r.position ?? '—'}</td>
       <td class="cn"></td>
       <td class="cs">${em ? `${em}<br><span class="en">${esc(en)}</span>` : ''}</td>
-      <td>${esc(r.name)}</td>
+      <td>${esc(displayName(r.name))}</td>
       <td>${esc(r.contact)}</td>
       <td class="cph">${esc(r.phone)}</td>
       <td class="csz">${esc(r.size)}</td>
@@ -1332,26 +1334,40 @@ function generatePrintWindow(rows) {
   const html = `<!DOCTYPE html><html lang="en"><head>
 <meta charset="UTF-8"><title>Felton Remembers 2026 — Parade Lineup</title>
 <style>
-  @page { margin:0.45in; size:letter portrait; }
-  *     { box-sizing:border-box; margin:0; padding:0; }
-  body  { font-family:Arial,Helvetica,sans-serif; font-size:8pt; color:#111; }
-  h1    { font-size:11.5pt; font-weight:700; margin-bottom:2px; }
-  .meta { font-size:7pt; color:#666; margin-bottom:6px; }
+  @page { margin:0.4in; size:letter landscape; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:Arial,Helvetica,sans-serif; font-size:8.5pt; color:#111; }
+  h1   { font-size:12pt; font-weight:700; margin-bottom:2px; }
+  .meta { font-size:7pt; color:#666; margin-bottom:8px; }
+
   table { border-collapse:collapse; width:100%; table-layout:fixed; }
-  col.cp  { width:3%; }   col.cn  { width:4%; }   col.cs  { width:5%; }
-  col.cna { width:18%; }  col.cct { width:14%; }  col.cph { width:13%; }
-  col.csz { width:4%; }   col.cv  { width:39%; }
-  th  { background:#2563eb; color:#fff; font-size:7.5pt; font-weight:700;
-        padding:3px 4px; border:1px solid #1d4ed8; text-align:left; white-space:nowrap; }
-  td  { padding:2px 4px; border:1px solid #ccc; vertical-align:top; word-break:break-word; }
+  col.cp  { width:2.5%; }
+  col.cn  { width:3%; }
+  col.cs  { width:4.5%; }
+  col.cna { width:19%; }
+  col.cct { width:13%; }
+  col.cph { width:12%; }
+  col.csz { width:3%; }
+  col.cv  { width:43%; }
+
+  /* Header: solid dark bar, no internal borders */
+  thead tr { border-bottom:2.5px solid #1e3a8a; }
+  th { background:#1e40af; color:#fff; font-size:8pt; font-weight:700;
+       padding:5px 7px; text-align:left; white-space:nowrap; }
+
+  /* Rows: alternating color, no grid lines — just a hairline guide at bottom of each row */
+  td { padding:4px 7px; vertical-align:top; word-break:break-word;
+       border-bottom:1px solid #e4e9f2; }
+  tr:nth-child(odd)  td { background:#ffffff; }
   tr:nth-child(even) td { background:#eef2ff; }
-  .cp  { text-align:center; font-weight:700; font-size:9pt; }
-  .cn  { background:#fffbeb !important; }
-  tr:nth-child(even) .cn { background:#fef9c3 !important; }
-  .cs  { text-align:center; font-size:13pt; line-height:1.1; }
-  .en  { font-size:5.5pt; color:#666; display:block; }
+
+  /* Column-specific */
+  .cp  { text-align:center; font-weight:700; font-size:9.5pt; white-space:nowrap; }
+  .cn  { /* blank write-in column — no special styling */ }
+  .cs  { text-align:center; font-size:14pt; line-height:1.15; }
+  .en  { font-size:6pt; color:#777; display:block; line-height:1.3; }
   .csz { text-align:center; }
-  .cph { white-space:nowrap; }
+  .cph { font-family:'Courier New',monospace; font-size:8pt; white-space:nowrap; }
 </style></head><body>
 <h1>Felton Remembers 2026 — Parade Lineup</h1>
 <div class="meta">Printed ${esc(now)} · ${rows.length} entries · CONFIDENTIAL</div>
