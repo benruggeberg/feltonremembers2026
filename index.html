@@ -161,6 +161,43 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
 @media (max-width:520px) {
   header h1 { font-size:0.85rem; }
 }
+
+/* ── VEHICLE TAG ── */
+.vehicle-tag { color:#d97706; font-weight:600; }
+
+/* ── PRINT ── */
+@media print {
+  @page { margin:0.5in; size:letter portrait; }
+  body { background:white !important; }
+  .hbtns, .action-bar, .search-row, #btn-add-float,
+  #add-form-wrap, .modal-overlay, .toast,
+  .drag-handle, .sel-cb, .btn-unlink { display:none !important; }
+  header { position:static !important; box-shadow:none !important;
+           background:white !important; color:black !important;
+           border-bottom:2px solid #2563eb; padding:6px 0 4px; }
+  header h1 { color:#2563eb; font-size:1rem; }
+  .container { max-width:100% !important; padding:0 !important; }
+  .float-list { column-count:2; column-gap:14px; }
+  .float-card, .member-card { break-inside:avoid; page-break-inside:avoid;
+    border:1px solid #ddd !important; border-radius:4px !important;
+    padding:3px 6px !important; margin-bottom:3px !important;
+    gap:4px !important; box-shadow:none !important; background:white !important; }
+  .float-card.has-safety, .member-card.has-safety { border-left:3px solid #dc2626 !important; }
+  .group-block { break-inside:avoid; page-break-inside:avoid;
+                 margin-bottom:5px !important; border-radius:6px !important; }
+  .group-header { padding:4px 8px !important; }
+  .group-members { padding:3px !important; gap:2px !important; }
+  .pos-badge { width:22px !important; height:22px !important;
+               font-size:0.72rem !important; border-radius:4px !important; }
+  .emoji-cell { width:28px !important; }
+  .emoji-btn { font-size:1.1rem !important; width:24px !important; height:24px !important; }
+  .ename { display:none !important; }
+  .float-info { margin-left:2px !important; }
+  .float-name { font-size:0.78rem !important; }
+  .float-notes { font-size:0.68rem !important; margin-top:1px !important; }
+  .group-name-label { font-size:0.82rem !important; }
+  .group-count { font-size:0.68rem !important; }
+}
 </style>
 </head>
 <body>
@@ -174,6 +211,7 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
     <button class="btn btn-ghost btn-sm" id="btn-sync" onclick="syncFromSheet()" style="display:none" title="Sync new registrations from spreadsheet">⟳ Sync</button>
     <button class="btn btn-ghost btn-sm" id="btn-save" onclick="saveOrderToSheet()" style="display:none" title="Save current order to sheet">💾 Save Order</button>
     <button class="btn btn-ghost btn-sm" id="btn-setup" onclick="openSyncModal()" style="display:none" title="Configure sheet sync">⚙️</button>
+    <button class="btn btn-ghost btn-sm" onclick="window.print()" title="Print lineup">🖨 Print</button>
     <button class="btn btn-ghost" id="btn-auth" onclick="toggleAuth()">🔒 Unlock</button>
   </div>
 </header>
@@ -312,8 +350,21 @@ const EMOJIS = [
   {e:'🎢',n:'Coaster'}, {e:'🔥',n:'Fire'},    {e:'🐧',n:'Penguin'},  {e:'🏅',n:'Award'},
   {e:'🥇',n:'Gold'},    {e:'🎋',n:'Bamboo'},  {e:'🌏',n:'Earth'},    {e:'🎑',n:'Festival'},
   {e:'🎓',n:'School'},  {e:'💃',n:'Dance'},   {e:'✝️',n:'Faith'},    {e:'🚲',n:'Bike'},
-  {e:'🏀',n:'Basketball'},{e:'⚽',n:'Soccer'}, {e:'🎾',n:'Tennis'},   {e:'🏐',n:'Volleyball'}
+  {e:'🏀',n:'Basketball'},{e:'⚽',n:'Soccer'}, {e:'🎾',n:'Tennis'},   {e:'🏐',n:'Volleyball'},
+  {e:'🪝',n:'Hook'},    {e:'🪓',n:'Axe'}
 ];
+
+// Fallback names (Unicode standard) for emojis added manually that aren't in the picker
+const EMOJI_NAME_FALLBACK = {
+  '🪝':'Hook',    '🪓':'Axe',      '🪄':'Wand',    '🏹':'Bow',      '🎣':'Fishing',
+  '🪂':'Skydive', '🛸':'UFO',      '🚁':'Copter',  '🛵':'Scooter',  '🚌':'Bus',
+  '🚐':'Minibus', '🚑':'Ambulance','🚓':'Police',  '🚕':'Taxi',     '🚛':'Semi',
+  '🚚':'Truck',   '🏎️':'Race Car', '🛺':'Rickshaw','🛴':'Kickscoot','🛼':'Skate',
+  '🎤':'Mic',     '🎬':'Film',     '📸':'Camera',  '🪗':'Accordion','🪘':'Drum',
+  '🪕':'Banjo',   '🎆':'Fireworks','🎇':'Sparkler','🧨':'Firecracker',
+  '🪁':'Yoyo',    '🪆':'Matryoshka','🎎':'Dolls',  '🤡':'Clown',   '🤖':'Robot',
+  '🦸':'Hero',    '🧙':'Wizard',   '🧜':'Mermaid', '🧚':'Fairy',
+};
 
 // ════════════════════════════════════════════════════════
 // EMOJI KEYWORD MATCHING
@@ -398,6 +449,7 @@ function load() {
     if (!('linkedGroupId'    in f)) f.linkedGroupId    = null;
     if (!('linkedGroupLabel' in f)) f.linkedGroupLabel = null;
     if (!('hasVet'           in f)) f.hasVet           = false;
+    if (!('hasVehicle'       in f)) f.hasVehicle       = false;
   });
 }
 function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(floats)); }
@@ -406,6 +458,10 @@ function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(floats)); }
 // UTILS
 // ════════════════════════════════════════════════════════
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function getEmojiName(e) {
+  const cat = EMOJIS.find(x => x.e === e);
+  return cat ? cat.n : (EMOJI_NAME_FALLBACK[e] || 'Custom');
+}
 function isSafety(n) { if (!n) return false; const l = n.toLowerCase(); return SAFETY_WORDS.some(w => l.includes(w)); }
 function usedEmojis(xId) { return floats.filter(f => f.id !== xId).map(f => f.emoji); }
 function esc(s) {
@@ -608,8 +664,7 @@ function syncFromSheet() {
           }
           if (row.emoji && existing.emoji !== row.emoji) {
             existing.emoji = row.emoji;
-            const cat = EMOJIS.find(x => x.e === row.emoji);
-            existing.ename = cat ? cat.n : 'Float';
+            existing.ename = getEmojiName(row.emoji);
             updated++;
           }
           if (row.position && existing.position !== row.position) {
@@ -620,6 +675,9 @@ function syncFromSheet() {
           }
           if (row.hasVet !== undefined && existing.hasVet !== !!row.hasVet) {
             existing.hasVet = !!row.hasVet; updated++;
+          }
+          if (row.hasVehicle !== undefined && existing.hasVehicle !== !!row.hasVehicle) {
+            existing.hasVehicle = !!row.hasVehicle; updated++;
           }
           if (row.group !== undefined) {
             const newLabel = row.group || null;
@@ -637,8 +695,7 @@ function syncFromSheet() {
       const name = String(row.name).trim();
       let em;
       if (row.emoji && !usedEmoji.has(row.emoji)) {
-        const catalogEntry = EMOJIS.find(x => x.e === row.emoji);
-        em = catalogEntry || { e: row.emoji, n: 'Float' };
+        em = { e: row.emoji, n: getEmojiName(row.emoji) };
       } else {
         em = suggestEmoji(name, usedEmoji);
       }
@@ -650,7 +707,7 @@ function syncFromSheet() {
       floats.push({ id: uid(), emoji: em.e, ename: em.n, name, notes: row.notes || '',
                     sheetKey: row.ts, position: row.position || null,
                     linkedGroupId: groupId, linkedGroupLabel: groupLabel,
-                    hasVet: !!row.hasVet });
+                    hasVet: !!row.hasVet, hasVehicle: !!row.hasVehicle });
       added++;
       if (row.position) reordered = true;
     }
@@ -986,12 +1043,14 @@ function renderCard(f, idx, context) {
     : `<div class="pos-badge${authenticated && !isMember ? ' pos-editable' : ''}"
          ${authenticated && !isMember ? `onclick="startEditPos('${f.id}')" title="Tap to set position"` : ''}>${pos}</div>`;
 
-  const vetBit  = f.hasVet ? `<span class="vet-tag">🎖 Has Vet</span>` : '';
+  const vetBit  = f.hasVet     ? `<span class="vet-tag">🎖 Has Vet</span>` : '';
+  const carBit  = f.hasVehicle ? `<span class="vehicle-tag">🚗 Has Vehicle</span>` : '';
   const noteBit = f.notes
     ? `<span class="${safety?'safety-note':''}">${safety?'⚠️ ':''}${esc(f.notes)}</span>` : '';
-  const divider = vetBit && noteBit ? `<span style="color:var(--gray-300)">|</span>` : '';
-  const notesRow = (vetBit || noteBit)
-    ? `<div class="float-notes">${vetBit}${divider}${noteBit}</div>` : '';
+  const tagBits = [vetBit, carBit, noteBit].filter(Boolean);
+  const sep = `<span style="color:var(--gray-300)">|</span>`;
+  const notesRow = tagBits.length
+    ? `<div class="float-notes">${tagBits.join(sep)}</div>` : '';
 
   const editForm = editingId===f.id ? `
     <div class="edit-form">
