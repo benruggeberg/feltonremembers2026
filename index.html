@@ -165,39 +165,6 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
 /* ── VEHICLE TAG ── */
 .vehicle-tag { color:#d97706; font-weight:600; }
 
-/* ── PRINT ── */
-@media print {
-  @page { margin:0.5in; size:letter portrait; }
-  body { background:white !important; }
-  .hbtns, .action-bar, .search-row, #btn-add-float,
-  #add-form-wrap, .modal-overlay, .toast,
-  .drag-handle, .sel-cb, .btn-unlink { display:none !important; }
-  header { position:static !important; box-shadow:none !important;
-           background:white !important; color:black !important;
-           border-bottom:2px solid #2563eb; padding:6px 0 4px; }
-  header h1 { color:#2563eb; font-size:1rem; }
-  .container { max-width:100% !important; padding:0 !important; }
-  .float-list { display:block; column-count:2; column-gap:14px; }
-  .float-card, .member-card { break-inside:avoid; page-break-inside:avoid;
-    border:1px solid #ddd !important; border-radius:4px !important;
-    padding:3px 6px !important; margin-bottom:3px !important;
-    gap:4px !important; box-shadow:none !important; background:white !important; }
-  .float-card.has-safety, .member-card.has-safety { border-left:3px solid #dc2626 !important; }
-  .group-block { break-inside:avoid; page-break-inside:avoid;
-                 margin-bottom:5px !important; border-radius:6px !important; }
-  .group-header { padding:4px 8px !important; }
-  .group-members { padding:3px !important; gap:2px !important; }
-  .pos-badge { width:22px !important; height:22px !important;
-               font-size:0.72rem !important; border-radius:4px !important; }
-  .emoji-cell { width:28px !important; }
-  .emoji-btn { font-size:1.1rem !important; width:24px !important; height:24px !important; }
-  .ename { display:none !important; }
-  .float-info { margin-left:2px !important; }
-  .float-name { font-size:0.78rem !important; }
-  .float-notes { font-size:0.68rem !important; margin-top:1px !important; }
-  .group-name-label { font-size:0.82rem !important; }
-  .group-count { font-size:0.68rem !important; }
-}
 </style>
 </head>
 <body>
@@ -211,7 +178,7 @@ header h1 { font-size:1rem; font-weight:700; flex:1; min-width:150px; }
     <button class="btn btn-ghost btn-sm" id="btn-sync" onclick="syncFromSheet()" style="display:none" title="Sync new registrations from spreadsheet">⟳ Sync</button>
     <button class="btn btn-ghost btn-sm" id="btn-save" onclick="saveOrderToSheet()" style="display:none" title="Save current order to sheet">💾 Save Order</button>
     <button class="btn btn-ghost btn-sm" id="btn-setup" onclick="openSyncModal()" style="display:none" title="Configure sheet sync">⚙️</button>
-    <button class="btn btn-ghost btn-sm" onclick="window.print()" title="Print lineup">🖨 Print</button>
+    <button class="btn btn-ghost btn-sm" onclick="openPrintView()" title="Print contact sheet (requires unlock)">🖨 Print</button>
     <button class="btn btn-ghost" id="btn-auth" onclick="toggleAuth()">🔒 Unlock</button>
   </div>
 </header>
@@ -1313,6 +1280,98 @@ function onMemberDrop(e, targetId) {
     dirtyOrder = true; save(); dragState = {}; renderList();
   }
   // Otherwise let event bubble for cross-group or out-of-group handling
+}
+
+// ════════════════════════════════════════════════════════
+// PRINT VIEW
+// ════════════════════════════════════════════════════════
+function openPrintView() {
+  if (!authenticated) { showToast('Unlock first to print the contact sheet'); return; }
+  if (!scriptUrl)     { showToast('No script URL configured'); return; }
+  showToast('Loading print data…');
+  jsonpCall({ action: 'loadFull', user: username },
+    data => {
+      if (!data || data.error) { showToast('⚠️ ' + (data?.error || 'Load failed')); return; }
+      generatePrintWindow(data.rows || []);
+    },
+    () => showToast('⚠️ Could not reach Apps Script'), 15000);
+}
+
+function generatePrintWindow(rows) {
+  rows.sort((a, b) => {
+    if (a.position && b.position) return a.position - b.position;
+    if (a.position) return -1; if (b.position) return 1; return 0;
+  });
+
+  function fmtVehicle(year, make, model) {
+    const y = String(year||'').trim(), mk = String(make||'').trim(), mo = String(model||'').trim();
+    const parts = [y, mk, mo].filter(Boolean);
+    if (!parts.length) return '';
+    // De-duplicate identical fields (e.g. Roaring Camp fills all three with same text)
+    if (parts.every(p => p === parts[0])) return parts[0];
+    return parts.join(' ');
+  }
+
+  const tbody = rows.map(r => {
+    const em  = r.emoji || '';
+    const en  = getEmojiName(em);
+    const veh = fmtVehicle(r.vehicleYear, r.vehicleMake, r.vehicleModel);
+    return `<tr>
+      <td class="cp">${r.position ?? '—'}</td>
+      <td class="cn"></td>
+      <td class="cs">${em ? `${em}<br><span class="en">${esc(en)}</span>` : ''}</td>
+      <td>${esc(r.name)}</td>
+      <td>${esc(r.contact)}</td>
+      <td class="cph">${esc(r.phone)}</td>
+      <td class="csz">${esc(r.size)}</td>
+      <td>${esc(veh)}</td>
+    </tr>`;
+  }).join('');
+
+  const now = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  const html = `<!DOCTYPE html><html lang="en"><head>
+<meta charset="UTF-8"><title>Felton Remembers 2026 — Parade Lineup</title>
+<style>
+  @page { margin:0.45in; size:letter portrait; }
+  *     { box-sizing:border-box; margin:0; padding:0; }
+  body  { font-family:Arial,Helvetica,sans-serif; font-size:8pt; color:#111; }
+  h1    { font-size:11.5pt; font-weight:700; margin-bottom:2px; }
+  .meta { font-size:7pt; color:#666; margin-bottom:6px; }
+  table { border-collapse:collapse; width:100%; table-layout:fixed; }
+  col.cp  { width:3%; }   col.cn  { width:4%; }   col.cs  { width:5%; }
+  col.cna { width:18%; }  col.cct { width:14%; }  col.cph { width:13%; }
+  col.csz { width:4%; }   col.cv  { width:39%; }
+  th  { background:#2563eb; color:#fff; font-size:7.5pt; font-weight:700;
+        padding:3px 4px; border:1px solid #1d4ed8; text-align:left; white-space:nowrap; }
+  td  { padding:2px 4px; border:1px solid #ccc; vertical-align:top; word-break:break-word; }
+  tr:nth-child(even) td { background:#eef2ff; }
+  .cp  { text-align:center; font-weight:700; font-size:9pt; }
+  .cn  { background:#fffbeb !important; }
+  tr:nth-child(even) .cn { background:#fef9c3 !important; }
+  .cs  { text-align:center; font-size:13pt; line-height:1.1; }
+  .en  { font-size:5.5pt; color:#666; display:block; }
+  .csz { text-align:center; }
+  .cph { white-space:nowrap; }
+</style></head><body>
+<h1>Felton Remembers 2026 — Parade Lineup</h1>
+<div class="meta">Printed ${esc(now)} · ${rows.length} entries · CONFIDENTIAL</div>
+<table>
+<colgroup><col class="cp"><col class="cn"><col class="cs"><col class="cna">
+<col class="cct"><col class="cph"><col class="csz"><col class="cv"></colgroup>
+<thead><tr>
+  <th>#</th><th>New #</th><th>Symbol</th><th>Group Name</th>
+  <th>Contact</th><th>Phone</th><th>Size</th><th>Vehicle</th>
+</tr></thead>
+<tbody>${tbody}</tbody>
+</table>
+<script>window.onload=function(){window.print();}<\/script>
+</body></html>`;
+
+  const blob = new Blob([html], { type:'text/html' });
+  const url  = URL.createObjectURL(blob);
+  const w    = window.open(url, '_blank');
+  if (!w) showToast('⚠️ Allow popups to open the print view');
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 // ════════════════════════════════════════════════════════
